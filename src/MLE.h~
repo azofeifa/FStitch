@@ -1,0 +1,495 @@
+//============================================================================
+// Name        : MLE.h
+// Author      : Joey Azofeifa
+// Version     : 1.0
+// Copyright   : Your copyright notice
+// Description : Main file for running Segmentation Package
+//============================================================================
+#include <vector>
+#include <string>
+#include <stdlib.h>
+#include <stdio.h>
+#include "functions.h"
+#include "grab_segments.h"
+#include "histogram.h"
+#include "simulateGMM.h"
+#ifndef MLE_H_
+#define MLE_H_
+
+class EM_Results{
+public:
+	double loglikelihood;
+	int G;
+	int U;
+	vector<double> mus;
+	vector<double> sigmas;
+	vector<double> weights;
+	string GENE_ID ;
+	int start, stop;
+	string chrom;
+	string strand;
+	EM_Results(double ll, int g, int u, double m[],double s[], double w[] ){
+		loglikelihood	= ll;
+		G				= g;
+		U				= u;
+		for (int i =0; i < (G+U) ; i++){
+			if (i < G){
+				mus.push_back(m[i]);
+				sigmas.push_back(s[i]);
+			}
+			weights.push_back(w[i]);
+		}
+	}
+	void setGeneCoords(int v1, int v2, string ID, string c, string s){
+		start	= v1;
+		stop	= v2;
+		GENE_ID	= ID;
+		chrom	= c;
+		strand	= s;
+	}
+	void unNormalize(){
+		for (int i =0; i < G ; i++){
+			mus[i]+=start;
+		}
+	}
+	string show(bool display = 0){
+		string info="";
+		if (mus.size()){
+			info= info+ "Strand: " + strand + "\n";
+			if (display){
+				cout<<"Strand: " + strand + "\n";
+				cout<<"loglikelihood: "<<loglikelihood<<endl;
+			}
+			info=info+"loglikelihood: " + to_string(loglikelihood) + "\n";
+			for (int i =0; i< mus.size(); i++){
+				if (display){
+					cout<<"weight: "<<(float)weights[i]<<"\tnormal: "<<i+1<<" "<<(long)mus[i]<<", "<<(long)sigmas[i]<<endl;
+				}
+				info=info+"weight: "+to_string((float)weights[i])+"\tnormal: "+to_string(i+1)+" "+to_string((long)mus[i])+", "+to_string((long)sigmas[i]) + "\n";
+			}
+			int i=mus.size();
+			info=info+"weight: "+to_string((float)weights[i])+"\tuniform: "+to_string(start)+","+to_string(stop) + "\n\n";
+			if (display){
+				cout<<"weight: "<<(float)weights[i]<<"\tuniform: "<<start<<", "<<stop<<endl<<endl;
+			}
+		}
+		else {
+			info="Strand: " + strand + "\tdid not converge\n";
+		}
+		return info;
+	}
+	EM_Results(){};
+};
+
+class EMBoth{
+public:
+	EM_Results sense;
+	EM_Results anti_sense;
+	string chrom;
+	int start;
+	int stop;
+	string GENE_ID;
+	int ID;
+	string strand;
+	EMBoth(string s , string c, int st, int sp, string gene, int id){
+		strand  = s;
+		chrom	= c;
+		start	= st;
+		stop	= sp;
+		GENE_ID	= gene;
+		ID		= id;
+	};
+	void add_sense(EM_Results S){
+		sense 		= S;
+	}
+	void add_anti(EM_Results S){
+		anti_sense	= S;
+	}
+	string show(){
+		bool display 	= 0;
+		string info 	= "Segment: " + to_string(ID) + "\tStrand: " + strand+ "\tChromosome: " + chrom + "\t" + to_string(start) +" - " + to_string(stop) + "\tGENE: " + GENE_ID + "\n";
+		info			= info + sense.show();
+		info			= info + anti_sense.show();
+
+		return info;
+	}
+
+};
+
+double	loglikelihood(vector <double> X, vector< double > Y, vector<distribution*> pdfs, double w[pdfs.size()]){
+	double x, y, sum, ll;
+	int N = X.size();
+	ll = 0;
+	for (int i = 0; i < N; i++){
+		x 	= X[i];
+		y 	= Y[i];
+		sum	= 0;
+		for (int k = 0; k < pdfs.size(); k++){
+			sum+=pdfs[k]->pdf(x) * w[k];
+		}
+		ll+=(log(sum)*y);
+	}
+	return ll;
+}
+
+EM_Results run(vector<double> X, vector<double> Y, int G, bool interactive){ //Currnetly only supports 1 Uniform
+	string input;
+	double sigma = 1000;
+	int U = 1;
+	if (interactive){
+		cout << "...Please Enter Number of Gaussians: ";
+		getline(cin, input);
+		G = atoi(input.c_str());
+		cout << "...Please Enter Begining Variance of Gaussians: ";
+		getline(cin, input);
+		sigma = (double)atoi(input.c_str());
+
+		cout << "...Assume Uniform Noise? (Enter 1 or 0): ";
+		getline(cin, input);
+		U = atoi(input.c_str());
+		if (U != 1 and U != 0){
+			cout << "...User Input for Uniform Noise not zero or one..."<<endl;
+			cout<<"Exiting..."<<endl;
+			return EM_Results();
+
+		}
+	}
+
+	int N	= X.size();		//Number of Emissions
+	int T	= 1000;			//MAX number of iterations before convergence
+	int t	= 0;			//Current iteration number
+	int D	= accumulate(Y.begin(), Y.end(), 0);		//Nunber of Data Points (sum of Y)
+	double x;				//Individual Data Variable in X
+	double ct;				//Individual Histogram CT
+	double w[G+U]; 			//weights
+	double m[G]; 			//means
+	double s[G]; 			//sigmas
+	double **R = new double *[G+U]; 		//responsibilities
+	srand ( time(NULL) );	//Seed Random Number Generator
+	double sum;				//Normalizing Factor in the R Matrix
+	double sum1;
+	double SR[G+U];
+	double ll	 	= 0;
+	double prev_ll	= 0;
+	double convergence_threshold 	= 0.1;
+	int reset_tolerance 			= 3;
+	int resets						= 0;
+	vector<distribution*> pdfs;
+
+
+
+	//===============================================
+	//	Initialize weights Uniformally for gaussians
+	//	Initialize "Responsbility" Matrix
+	//===============================================
+
+	for (int i = 0; i < (G+U); i++){
+		if (i < G){
+			w[i] 	= 1.0 / (G+U);
+		}
+		else{
+			w[i] 	= 0.0001;
+		}
+		R[i]	= new double[N];		//Note: First Index is Model Second is the Data Point
+	}
+	if ((G+U) == 0){
+		cout<<"Exiting..."<<endl;
+		return EM_Results();
+	}
+	//=============================================
+	//	Initialize mu and Sigma randomly
+	//=============================================
+	for (int i = 0; i < G; i++){
+		pdfs.push_back(new normal( rand()%(int)X[X.size()-1], sigma));
+	}
+	//=============================================
+	//	Uniform to Length of Segment
+	//=============================================
+	if (U > 0){
+		pdfs.push_back( new uniform(X[0], X[X.size()-1]));
+	}
+	//=============================================
+	//	Begin EM
+	//=============================================
+	if (interactive){
+		cout << "...Begining..."<<endl;
+		cout << "...Press RETURN to continue or Q Enter to quit...\n";
+
+	}
+	EM_Results results;
+	while (t < T){
+		//=========================================================
+		//	If the loglikilhood diverges (due to
+		//	precision errors which is due to sigma
+		// 	either exploding or converging on one point
+		//	i.e. zero, than reset t to zero and try again
+		//	with uniform weights and new mus.
+		//	Only do this so many times after some tolerance
+		//	this gene is hopeless....
+		//=========================================================
+		if (not ll){
+			ll 	= loglikelihood(X, Y, pdfs, w);
+		}
+		if (ll!=ll and resets < reset_tolerance){
+			resets+=1;
+			for (int k = 0; k < (G+U); k++){
+				if (k < G){
+					pdfs[k]->reset(rand()%(int)X[X.size()-1],1000);
+					w[k] 	= 1.0 / (G+U);
+				}
+				else{
+					w[k] 	= 0.0001;
+				}
+			}
+			t 		= 0;
+			ll		= 0;
+			prev_ll	= 0;
+		}
+		else if (ll!=ll){
+			t=T;
+			break;
+		}
+		//=======================================================================
+		//	Watch Convergence (or lack there of...)
+		if (interactive){
+			getline(cin, input);
+
+			if (input == "q"){
+				cout<<"Exiting..."<<endl;
+				break;
+			}
+			cout<<"############################################"<<endl;
+			cout<<"...Current Parameter Set..."<<endl;
+			for (int i = 0; i < (G+U); i++){
+				cout<<"Weight: "<< w[i]<< "\t";
+				pdfs[i]->show();
+			}
+			cout<<"LogLikelihood: "<<ll<<endl;
+		}
+		//=======================================================================
+
+
+		//=====================================
+		//	Calculated Responsibilities
+		//=====================================
+		for (int i = 0; i < N; i++){
+			x 	= X[i];
+			sum	= 0;
+			for (int k = 0; k < (G+U); k++){
+				R[k][i] 	= (pdfs[k]->pdf(x) * w[k]);
+				sum+=R[k][i];
+			}
+			//NORMALIZE...helps with the precision errors
+			for (int k = 0; k < (G+U); k++){
+				if (sum){
+					R[k][i]/=sum;
+				}
+			}
+		}
+
+		//=======================================
+		//	Sum up responsibilities
+		//=======================================
+		for (int i = 0; i < N; i++){
+			for (int k = 0; k  < (G+U) ; k++){
+				SR[k]+=(Y[i]*R[k][i]);
+			}
+		}
+
+		//=======================================================
+		//	Calculated MU: Sample Mean weight by SR
+		//=======================================================
+		for (int i = 0; i < N; i++){
+			x 	= X[i];
+			ct	= Y[i];
+			for (int k = 0; k < G; k++){
+				m[k] += (x*ct*R[k][i]);
+			}
+		}
+
+		for (int k = 0; k < G; k++){
+			if (SR[k]){
+				m[k]/=SR[k];
+			}
+		}
+
+
+		//=========================================================
+		//	Calculated SigamSquared: Sample Variance weighted by SR
+		//=========================================================
+		for (int i = 0; i < N; i++){
+			x 	= X[i];
+			ct	= Y[i];
+			for (int k = 0; k < G; k++){
+				s[k]+=( R[k][i] * ct * pow(x-m[k], 2) );
+			}
+		}
+
+
+
+		//=======================================
+		//	Set New Mus and Sigmas
+		//=======================================
+		for (int k = 0; k < G; k++){
+			if (SR[k]){
+				pdfs[k]->reset(m[k], s[k]/SR[k]);
+			}
+		}
+
+		//=======================================
+		//	Set New Weights
+		//=======================================
+		sum=0;
+		for (int k = 0; k < (G+U); k++ ){ //Normalize Weights so their sum equals 1
+			if (k < G){
+				if (D){
+					w[k] = SR[k] / D;
+				}
+				sum+=w[k];
+			}else{
+				w[k] = (sum / (G+U));
+				sum+=(sum / (G+U));
+			}
+		}
+		for (int k = 0; k < (G+U); k++ ){ //Normalize Weights so their sum equals 1
+			if (sum){
+				w[k]/= sum;
+			}
+		}
+
+		if (not prev_ll){
+			prev_ll = loglikelihood(X, Y, pdfs, w);;
+		}
+		else{
+			ll 	= loglikelihood(X, Y, pdfs, w);
+			if (abs(prev_ll - ll) < convergence_threshold){
+				results = EM_Results(ll, G,U, m, s, w);
+				break;
+			}
+			else{
+				prev_ll = ll;
+			}
+		}
+
+		//============================
+		//	Reset Variables
+		//============================
+		for (int k = 0; k< G; k++){
+			m[k] 	= 0;
+			s[k] 	= 0;
+			SR[k] 	= 0;
+		}
+		t++;
+
+	}
+	if (t == T){
+		if (ll!=ll){
+			results = EM_Results();
+		}
+		else{
+			results = EM_Results(ll, G,U, m, s, w);
+		}
+	}
+
+	//=============================================
+	//	Clear Allocated Memory
+	//=============================================
+	for (int i = 0; i < G+U; i++){
+		delete R[i];
+	}
+	for (int i = 0; i < pdfs.size(); i++){
+		delete pdfs[i];
+	}
+
+	return results;
+}
+
+
+
+vector<EMBoth> estimate(vector<segment> segments, bool interactive, int G, int U, string s, bool SHOW = 0){
+
+	int N 				= segments.size();
+	vector<EMBoth> 		MMResults;
+	if (not N){
+		cout<<"Segments were not gathered...Please check provided segment/classification file..."<<endl;
+		cout<<"Exiting..."<<endl;
+		return MMResults;
+	}
+
+	int n				= 0;
+	int KB				= 2;
+	int binSize			= 100;
+	bool interact		= interactive;
+	int start, stop;
+
+	vector<double>		X;
+	vector<double>		Y;
+	vector<double> 		coordinates;
+	vector<double> 		coverages;
+
+	string chrom,strand, GENE_ID;
+	string prev_chrom	= "";
+	results hist_struct;
+	for (int i=0; i< N; i++){
+		n	= segments[i].sense_coordinates.size();
+		if (n){
+			chrom	= segments[i].chrom;
+			start 	= segments[i].sense_coordinates[0];
+			stop 	= segments[i].sense_coordinates[n-1];
+			GENE_ID	= segments[i].GENE_ID;
+			EMBoth	results(s ,chrom, start, stop, GENE_ID, i+1);
+			EM_Results curr_struct;
+			for (int  k =0; k <2; k ++){
+				if (k < 1 ){
+					//=====================================================
+					//	Fit "Sense" Strand (called by Segment)
+					//=====================================================
+					coordinates = segments[i].sense_coordinates;
+					coverages 	= segments[i].sense_coverages;
+					strand 		= "+";
+
+				}else{
+					coordinates = segments[i].anti_coordinates;
+					coverages 	= segments[i].anti_coverages;
+					strand 		= "-";
+				}
+				n 	= coordinates.size();
+				if (n > 10){
+
+					if (chrom!=prev_chrom and SHOW){
+						cout<<"...working on "<<chrom<<" segments..."<<endl;
+						prev_chrom = chrom;
+					}
+
+					for (int j =0; j < n; j++ ){
+						X.push_back((coordinates[j] - coordinates[0]));
+					}
+
+					hist_struct = bin(X,coverages,binSize);
+					curr_struct	= run(hist_struct.edges, hist_struct.counts, G,interact);
+					if (curr_struct.mus.size()){
+						curr_struct.setGeneCoords(start,stop, GENE_ID, chrom, strand);
+						curr_struct.unNormalize();
+						if (k < 1){
+							results.add_sense(curr_struct);
+						}
+						else{
+							results.add_anti(curr_struct);
+						}
+					}
+					X.clear();
+					coordinates.clear();
+					coverages.clear();
+				}
+				else{
+					curr_struct.setGeneCoords(start,stop, GENE_ID, chrom, strand);
+				}
+
+			}
+			MMResults.push_back(results);
+		}
+	}
+	return MMResults;
+}
+
+#endif /* MLE_H_ */
