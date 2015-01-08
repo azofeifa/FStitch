@@ -1,9 +1,5 @@
 <head>
-...
-    <script type="text/javascript"
-            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-    </script>
-...
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 </head>
 #FStitch
 ##Usage
@@ -33,9 +29,7 @@ Importantly, will you now see the executable “FStitch” in the src directory.
 
 ##train
 FStitch uses two probabilistic models to classify regions of high read density that may be indicative of nascent transcription (GRO-seq) or read coverage peak (ChIP-seq): Logistic Regression and a Hidden Markov Model. Commonly 
-Here is an example MathJax inline rendering \\( 1/x^{2} \\), and here is a block rendering: 
-\\[ \frac{1}{n^{2}} \\]
-
+(E=mc^2)，$$x_{1,2} = \frac{-b \pm \sqrt{b^2-4ac}}{2b}.$$
 
 
 
