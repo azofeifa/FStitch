@@ -1,3 +1,0 @@
-cd src/
-rm write.o
-make
