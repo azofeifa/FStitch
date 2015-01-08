@@ -1,3 +1,10 @@
+<head>
+...
+    <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+...
+</head>
 #FStitch
 ##Usage
 Scientists looking to classify regions of high read density in Globab Run On sequencing will find Fast Read Stitcher (FStitch) most useful as it identifies putative nascent transcripts __de novo__. However, users may also find this package useful as a ChIP-seq peak caller.
