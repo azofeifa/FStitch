@@ -26,10 +26,8 @@ Importantly, will you now see the executable “FStitch” in the src directory.
 
 ##train
 FStitch uses two probabilistic models to classify regions of high read density that may be indicative of nascent transcription (GRO-seq) or read coverage peak (ChIP-seq): Logistic Regression and a Hidden Markov Model. Commonly 
-\begin{equation}
-4*5
-\end{equation}
-
+Here is an example MathJax inline rendering \\( 1/x^{2} \\), and here is a block rendering: 
+\\[ \frac{1}{n^{2}} \\]
 
 
 
