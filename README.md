@@ -3,7 +3,7 @@
 Scientists looking to classify regions of high read density in Globab Run On sequencing will find Fast Read Stitcher (FStitch) most useful as it identifies putative nascent transcripts _de novo_<sup>1</sup>. However, users may also find this package useful as a ChIP-seq peak caller.
 ##Output
 
-![alt tag](https://github.com/azofeifa/FStitch/images/IGV_SNAP.png “FStitch Output in IGV“)
+![alt tag](https://github.com/azofeifa/FStitch/blob/master/images/IGV_SNAP.png “FStitch Output in IGV“)
 
 ##System Requirements
 FStitch is written in the C++ programming language and uses OpenMP to parallelize portions of the program.  With this in mind, users will need to have a GCC compilers later than version 4.2 to compile and run FStitch. For mac users, downloading the latest Xcode will update the GCC compiler need be. To check you compiler version, 
