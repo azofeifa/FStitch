@@ -52,6 +52,8 @@ FStitch uses two probabilistic models to classify regions of high read density t
 In short, FStitch requires regions the user considers active transcription (or a peak) and regions considered inactive (simply noise). We note that the more regions provided to FStitch the more accurate the classifications however we have in Cross Validation<sup>1</sup> analysis that roughly 5-10 regions of active and inactive regions will yield highly accurate classifications. These regions are provided to FStitch using a specific file format with four columns separated by tabs: chromosome, genomic coordinate start, genomic coordinate stop, (0 if “noise” or 1 “inactive”). An example is given below:
 
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/TrainingFileImage.png)
+
+The segments do not need to be in any order and can be from any chromosome, however each region must not overlap any other segment as this will cause confusion in the learning algorithms for the logistic regression classifier. 
     
 
 
