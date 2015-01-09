@@ -1,6 +1,9 @@
 #FStitch
 ##Usage
-Scientists looking to classify regions of high read density in Globab Run On sequencing will find Fast Read Stitcher (FStitch) most useful as it identifies putative nascent transcripts _de novo_. However, users may also find this package useful as a ChIP-seq peak caller.
+Scientists looking to classify regions of high read density in Globab Run On sequencing will find Fast Read Stitcher (FStitch) most useful as it identifies putative nascent transcripts _de novo_<sup>1</sup>. However, users may also find this package useful as a ChIP-seq peak caller.
+##Output
+![alt text](https://github.com/azofeifa/FStitch/images/IGV_SNAP.png "Logo Title Text 1")
+
 ##System Requirements
 FStitch is written in the C++ programming language and uses OpenMP to parallelize portions of the program.  With this in mind, users will need to have a GCC compilers later than version 4.2 to compile and run FStitch. For mac users, downloading the latest Xcode will update the GCC compiler need be. To check you compiler version, 
 
@@ -31,9 +34,7 @@ The fast read stitcher attempts to classify and identify contiguous regions of r
 
 
 ##FStitch train
-FStitch uses two probabilistic models to classify regions of high read density that may be indicative of nascent transcription (GRO-seq) or read coverage peak (ChIP-seq): Logistic Regression and a Hidden Markov Model. The logistic regression coefficients are estimated via a user defined label training file.  Sense we are classifying regions as signal or noise, FStitch requires regions of the genome that show characteristic transcription or high read dense profiles and regions of the genome that display noise or not a profile of nascent transcription or a read dense region. With this information, FStitch trains a logistic regression classifier and then couples it to a hidden markov model. The transition parameters for the HMM are learned via the Baum Welch algorithm and thus do not require user label training data.  
-
-
+FStitch uses two probabilistic models to classify regions of high read density that may be indicative of nascent transcription (GRO-seq) or a read coverage peak (ChIP-seq): Logistic Regression and a Hidden Markov Model. The logistic regression coefficients are estimated via a user defined label training file.  Sense we are classifying regions as signal or noise, FStitch requires regions of the genome that show characteristic transcription or high read dense profiles and regions of the genome that display noise or not a profile of nascent transcription or a read dense region. With this information, FStitch trains a logistic regression classifier and then couples it to a hidden markov model. The transition parameters for the HMM are learned via the Baum Welch algorithm and thus do not require user label training data.  
 
 
 This file comprise four columns that are separated by tabs.  
@@ -46,6 +47,7 @@ This file comprise four columns that are separated by tabs.
 ## Understanding and Interpreting Output
 ##References
 1. 
+
 2.
 
 
