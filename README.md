@@ -62,9 +62,9 @@ The segments do not need to be in any order and can be from any chromosome, howe
 ##FStitch segment
 ###parameters
 ## Understanding and Interpreting Output
-##References
-1. 
-
-2.
+##References 
+1. FStitch   
+2. UCSC BedGraph Format
+3. bedtools
 
 
