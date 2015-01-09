@@ -38,7 +38,7 @@ The fast read stitcher program attempts to classify and identify contiguous regi
   
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/BedGraphScreenShot.png)
 
-Note: FStitch does not accept bed graph files where 0 coverage values are reported. In short, you can convert your bam files to a bed graph file format using bedtools<sup>3</sup>:
+Note: FStitch does not accept bed graph files where 0 coverage values are reported. In short, you can convert your bam files to a bed graph file format using the _bedtools_<sup>3</sup> command:
 
 $bedtools genomecov -ibam <bamfile> -g <genome_file> -bg
 
@@ -49,9 +49,10 @@ We note that specifying five prime (-5) in the “genomecov” may allow for cle
 ##FStitch train
 FStitch uses two probabilistic models to classify regions of high read density that may be indicative of nascent transcription (GRO-seq) or a read coverage peak (ChIP-seq): Logistic Regression and a Hidden Markov Model. The logistic regression coefficients are estimated via a user defined label training file.  Sense we are classifying regions as signal or noise, FStitch requires regions of the genome that show characteristic transcription or high read dense profiles and regions of the genome that display noise or not a profile of nascent transcription or a read dense region. With this information, FStitch trains a logistic regression classifier and then couples it to a hidden markov model. The transition parameters for the HMM are learned via the Baum Welch algorithm and thus do not require user label training data.  
 
+In short, FStitch requires regions the user considers active transcription (or a peak) and regions considered inactive (simply noise). We note that the more regions provided to FStitch the more accurate the classifications however we have in Cross Validation<sup>1</sup> analysis that roughly 5-10 regions of active and inactive regions will yield highly accurate classifications. These regions are provided to FStitch using a specific file format with four columns separated by tabs: chromosome, genomic coordinate start, genomic coordinate stop, (0 if “noise” or 1 “inactive”). An example is given below:
 
-This file comprise four columns that are separated by tabs.  
-
+![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/TrainingFileImage.png)
+    
 
 
 ###parameters
