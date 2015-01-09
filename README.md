@@ -1,9 +1,14 @@
 #FStitch
-##Usage
-Scientists looking to classify regions of high read density in Globab Run On sequencing will find Fast Read Stitcher (FStitch) most useful as it identifies putative nascent transcripts _de novo_<sup>1</sup>. However, users may also find this package useful as a ChIP-seq peak caller.
-##Output
+##Usage and Output
+Scientists looking to classify regions of high read density in Globab Run On sequencing will find Fast Read Stitcher (FStitch) most useful as it 
+identifies putative nascent transcripts _de novo_<sup>1</sup>. However, users may also find this package useful as a ChIP-seq peak caller.
 
-![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/IGV_SNAP.png)
+
+![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/IGV_SNAP.png “FStitch Output”)
+
+
+The above IGV Snap shot displays the classifications given by FStitch. Color ‘green’ is read data considered inactive noise. Color ‘blue’ is a putative nascent transcript on the forward strand and ‘red’ on the reverse strand. We identify both genes undergoing nascent transcription and many regions that are unannotated characteristic of enhancer elements. 
+
 
 ##System Requirements
 FStitch is written in the C++ programming language and uses OpenMP to parallelize portions of the program.  With this in mind, users will need to have a GCC compilers later than version 4.2 to compile and run FStitch. For mac users, downloading the latest Xcode will update the GCC compiler need be. To check you compiler version, 
