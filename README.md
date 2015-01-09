@@ -4,7 +4,7 @@ Scientists looking to classify regions of high read density in Globab Run On seq
 identifies putative nascent transcripts _de novo_<sup>1</sup>. However, users may also find this package useful as a ChIP-seq peak caller.
 
 
-![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/IGV_SNAP.png “FStitch Output”)
+![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/IGV_SNAP.png)
 
 
 The above IGV Snap shot displays the classifications given by FStitch. Color ‘green’ is read data considered inactive noise. Color ‘blue’ is a putative nascent transcript on the forward strand and ‘red’ on the reverse strand. We identify both genes undergoing nascent transcription and many regions that are unannotated characteristic of enhancer elements. 
