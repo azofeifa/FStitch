@@ -33,10 +33,17 @@ $Sucessfully Compiled
 
 Importantly, will you now see the executable “FStitch” in the src directory. This will be the command used for the following computations. 
 ##Bedgraph Files
-The fast read stitcher attempts to classify and identify contiguous regions of read coverage that are showing strong signal over background mapping noise. With this in mind, FStitch requires a BedGraph file. Where for each genomic position, the number of reads mapping to that position are provided. This commonly known as a BedGraph file<sup>2</sup>.   
+The fast read stitcher program attempts to classify and identify contiguous regions of read coverage that are showing strong signal over background mapping noise. With this in mind, FStitch requires a BedGraph file. Where for each genomic position, the number of reads mapping to that position are provided. This commonly known as a BedGraph file<sup>2</sup>. Briefly a BedGraph file consists of four columns: chromosome, start genomic coordinate, stop genomic coordinate, coverage. Below is an example:
 
+  
+![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/BedGraphScreenShot.png)
 
+Note: FStitch does not accept bed graph files where 0 coverage values are reported. In short, you can convert your bam files to a bed graph file format using bedtools<sup>3</sup>:
 
+$bedtools genomecov -ibam <bamfile> -g <genome_file> -bg
+
+We note that specifying five prime (-5) in the “genomecov” may allow for cleaner annotations however unspecified five prime bed works just fine as well. 
+ 
 
 
 ##FStitch train
