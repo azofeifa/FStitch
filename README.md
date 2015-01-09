@@ -24,7 +24,7 @@ $Sucessfully Compiled
 
 Importantly, will you now see the executable “FStitch” in the src directory. This will be the command used for the following computations. 
 ##Bedgraph Files
-The fast read stitcher attempts to classify and identify contiguous regions of read coverage that are showing strong signal over background mapping noise. With this in mind, FStitch requires a BedGraph file. Where for each genomic position, the number of reads mapping to that position are provided. This commonly known as a BedGraph file<sup></sup>1.  
+The fast read stitcher attempts to classify and identify contiguous regions of read coverage that are showing strong signal over background mapping noise. With this in mind, FStitch requires a BedGraph file. Where for each genomic position, the number of reads mapping to that position are provided. This commonly known as a BedGraph file<sup></sup 1>.  
 
 
 
