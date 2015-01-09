@@ -12,7 +12,7 @@ using namespace std;
 bool isNeg(string OUT){
 	for (int i = 0; i < OUT.size(); i++){
 		for (int j = i; j < OUT.size(); j++){
-			if (OUT.substr(i,j)=="neg" or OUT.substr(i,j) =="-"){
+			if (OUT.substr(i,OUT.size()-j)=="neg" or OUT.substr(i,OUT.size()-j) =="-"){
 				return 1;
 			}
 		}
@@ -78,6 +78,7 @@ int run_main_segment(paramsSegment  PT){
 	int num_proc 				= stoi(np);
 	if (strand.empty()){
 		if (isPos(BedGraphFile)){
+
 			strand = "+";
 		}else if(isNeg(BedGraphFile)){
 			strand = "-";

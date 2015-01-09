@@ -130,7 +130,11 @@ void writeViterbiPaths(string OUT, map<string, state*> results, string refFile, 
 				if (not prevState.empty()){
 					if (prevState == "ON"){
 						score 	= "100";
-						RGB 	= "0,0,255";
+						if (strand == "+" or strand == "."){
+							RGB 	= "0,0,255";
+						}else{
+							RGB 	= "255,0,0";
+						}
 					}else{
 						score 	= "500";
 						RGB 	= "0,255,0";	
