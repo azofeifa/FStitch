@@ -21,7 +21,7 @@ $g++ —-version
 
 Note, for those running FStitch on a compute cluster, commonly you will need to perform a ‘module load gcc<version>’ to compile FStitch. Please ask your sys admins for questions on module load behavior. 
 ##Setup
-If your compiler is up to date, you can compile FStitch by moving into the FastReadStitcher/ directory and running 
+Download the FastReadStitcher/ directory from this url or clone to your local machine. If your compiler is up to date, you can compile FStitch by moving into the FastReadStitcher/ directory and running 
 
 $sh setup.sh
 
@@ -32,7 +32,7 @@ $=========================================
 $Sucessfully Compiled
 
 Importantly, will you now see the executable “FStitch” in the src directory. This will be the command used for the following computations. 
-##Bedgraph Files
+##Input File
 The fast read stitcher program attempts to classify and identify contiguous regions of read coverage that are showing strong signal over background mapping noise. With this in mind, FStitch requires a BedGraph file. Where for each genomic position, the number of reads mapping to that position are provided. This commonly known as a BedGraph file<sup>2</sup>. Briefly a BedGraph file consists of four columns: chromosome, start genomic coordinate, stop genomic coordinate, coverage. Below is an example:
 
   
@@ -43,8 +43,9 @@ Note: FStitch does not accept bed graph files where 0 coverage values are report
 $bedtools genomecov -ibam <bamfile> -g <genome_file> -bg
 
 We note that specifying five prime (-5) in the “genomecov” may allow for cleaner annotations however unspecified five prime bed works just fine as well. 
- 
 
+##Running FStitch
+The Fast Read Stitcher program is divided into two main commands: “train” and “segment”. “train” estimates the necessary probabilistic model parameters and “segment” pulls the output from “train” and classifies the entire genome into _active_ and _inactive_ regions of regions of high density read coverage. 
 
 ##FStitch train
 FStitch uses two probabilistic models to classify regions of high read density that may be indicative of nascent transcription (GRO-seq) or a read coverage peak (ChIP-seq): Logistic Regression and a Hidden Markov Model. The logistic regression coefficients are estimated via a user defined label training file.  Sense we are classifying regions as signal or noise, FStitch requires regions of the genome that show characteristic transcription or high read dense profiles and regions of the genome that display noise or not a profile of nascent transcription or a read dense region. With this information, FStitch trains a logistic regression classifier and then couples it to a hidden markov model. The transition parameters for the HMM are learned via the Baum Welch algorithm and thus do not require user label training data.  
@@ -54,10 +55,10 @@ In short, FStitch requires regions the user considers active transcription (or a
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/TrainingFileImage.png)
 
 The segments do not need to be in any order and can be from any chromosome, however each region must not overlap any other segment as this will cause confusion in the learning algorithms for the logistic regression classifier. 
-    
 
 
-###parameters
+
+###running FStitch train
 ##FStitch segment
 ###parameters
 ## Understanding and Interpreting Output
