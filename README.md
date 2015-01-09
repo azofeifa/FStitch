@@ -1,6 +1,6 @@
 #FStitch
 ##Usage
-Scientists looking to classify regions of high read density in Globab Run On sequencing will find Fast Read Stitcher (FStitch) most useful as it identifies putative nascent transcripts __de novo__. However, users may also find this package useful as a ChIP-seq peak caller.
+Scientists looking to classify regions of high read density in Globab Run On sequencing will find Fast Read Stitcher (FStitch) most useful as it identifies putative nascent transcripts _de novo_. However, users may also find this package useful as a ChIP-seq peak caller.
 ##System Requirements
 FStitch is written in the C++ programming language and uses OpenMP to parallelize portions of the program.  With this in mind, users will need to have a GCC compilers later than version 4.2 to compile and run FStitch. For mac users, downloading the latest Xcode will update the GCC compiler need be. To check you compiler version, 
 
@@ -24,7 +24,7 @@ $Sucessfully Compiled
 
 Importantly, will you now see the executable “FStitch” in the src directory. This will be the command used for the following computations. 
 ##Bedgraph Files
-The fast read stitcher attempts to classify and identify contiguous regions of read coverage that are showing strong signal over background mapping noise. With this in mind, FStitch requires a BedGraph file. Where for each genomic position, the number of reads mapping to that position are provided. This commonly known as a BedGraph file^1.  
+The fast read stitcher attempts to classify and identify contiguous regions of read coverage that are showing strong signal over background mapping noise. With this in mind, FStitch requires a BedGraph file. Where for each genomic position, the number of reads mapping to that position are provided. This commonly known as a BedGraph file<sup></sup>1.  
 
 
 
