@@ -59,9 +59,9 @@ The segments do not need to be in any order and can be from any chromosome, howe
 ###running FStitch train
 Running FStitch train is simple once you have your data in the correct format and have created the training file above. A description of the parameters for FStitch train are given below
 
-1. -i  = </path/to/BedGraphFile> “BedGraph File from above”
-2. -j  = </path/to/TrainingFile> “Training File from above”
-3. -o  = </path/to/anyName> “TrainingParameterOutFile”
+1. -i  = /</path/to/BedGraphFile> “BedGraph File from above”
+2. -j  = /</path/to/TrainingFile> “Training File from above”
+3. -o  = /</path/to/anyName> “TrainingParameterOutFile”
 4. -np = number “number of processors, default 8”
 5. -al = number “learning rate for newtons method, default 1”
 6. -cm = number “max number of iterations for Baum-Welch, default 100”
@@ -69,7 +69,7 @@ Running FStitch train is simple once you have your data in the correct format an
 8. -v  = no value “verbose output, recommended for first time users”
 Putting this together
 
-$/src/FStitch train -i </path/to/BedGraphFile> -j </path/to/TrainingFile> -o </path/to/anyName.out>
+$/src/FStitch train -i /</path/to/BedGraphFile>/ -j </path/to/TrainingFile> -o </path/to/anyName.out>
 
 This will produce the a fie called anyName.out that will store the learned parameters for the logistic regression and HMM transition parameters need in “FStitch segment”. Below is one such output for anyName.out
 
