@@ -31,7 +31,7 @@ $=========================================
 
 $Sucessfully Compiled
 
-Importantly, will you now see the executable “FStitch” in the src directory. This will be the command used for the following computations. 
+Importantly, you will now see the executable “FStitch” in the src directory. This will be the first command used for all the following computations. 
 ##Input File
 The fast read stitcher program attempts to classify and identify contiguous regions of read coverage that are showing strong signal over background mapping noise. With this in mind, FStitch requires a BedGraph file. Where for each genomic position, the number of reads mapping to that position are provided. This commonly known as a BedGraph file<sup>2</sup>. Briefly a BedGraph file consists of four columns: chromosome, start genomic coordinate, stop genomic coordinate, coverage. Below is an example:
 
@@ -56,9 +56,27 @@ In short, FStitch requires regions the user considers active transcription (or a
 
 The segments do not need to be in any order and can be from any chromosome, however each region must not overlap any other segment as this will cause confusion in the learning algorithms for the logistic regression classifier. 
 
-
-
 ###running FStitch train
+Running FStitch train is simple once you have your data in the correct format and have created the training file above. A description of the parameters for FStitch train are given below
+
+1. -i  = </path/to/BedGraphFile> “BedGraph File from above”
+2. -j  = </path/to/TrainingFile> “Training File from above”
+3. -o  = </path/to/anyName> “TrainingParameterOutFile”
+4. -np = number “number of processors, default 8”
+5. -al = number “learning rate for newtons method, default 1”
+6. -cm = number “max number of iterations for Baum-Welch, default 100”
+7. -ct = number “convergence threshold for Baum Welch, default 0.01”
+8. -v  = no value “verbose output, recommended for first time users”
+Putting this together
+
+$/src/FStitch train -i </path/to/BedGraphFile> -j </path/to/TrainingFile> -o </path/to/anyName.out>
+
+This will produce the a fie called anyName.out that will store the learned parameters for the logistic regression and HMM transition parameters need in “FStitch segment”. Below is one such output for anyName.out
+
+![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/ParameterOutFile.png)
+
+
+
 ##FStitch segment
 ###parameters
 ## Understanding and Interpreting Output
