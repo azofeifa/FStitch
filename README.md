@@ -19,7 +19,7 @@ $FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/Parameters.out> -o \
 
 <sup>__**__</sup>Classifications.bed can be imported into any genome browser. 
 
-<sup>__***__</sup>When using stranded data like GRO-seq, FStitch runs on each strand separately, so created BedGraph files from bam files must be separated by strand accordingly, see below for detail 
+<sup>__***__</sup>When using stranded data like GRO-seq, FStitch runs on each strand separately, so created BedGraph files from bam files must be separated by strand accordingly, see below for details.
 
 
 ##System Requirements
@@ -109,10 +109,14 @@ This will produce a file called anyName.bed, and can be imported into any genome
 
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/ClassificationsIGV.png)
 
-## Understanding and Interpreting Output
+## Cite
+If you find the Fast Read Stitcher program useful for your research please cite:
+
+Joseph Azofeifa, Mary A. Allen, Manuel Lladser, and Robin Dowell. 2014. __FStitch: a fast and simple algorithm for detecting nascent RNA transcripts.__ In Proceedings of the 5th ACM Conference on Bioinformatics, Computational Biology, and Health Informatics (BCB '14). ACM, New York, NY, USA, 174-183. 
+
 ##References 
-1. FStitch   
-2. UCSC BedGraph Format
-3. bedtools
-4. openMP
+1. Joseph Azofeifa, Mary A. Allen, Manuel Lladser, and Robin Dowell. 2014. __FStitch: a fast and simple algorithm for detecting nascent RNA transcripts.__ In Proceedings of the 5th ACM Conference on Bioinformatics, Computational Biology, and Health Informatics (BCB '14). ACM, New York, NY, USA, 174-183. DOI=10.1145/2649387.2649427 http://doi.acm.org/10.1145/2649387.2649427   
+2. http://genome.ucsc.edu/goldenpath/help/bedgraph.html
+3. http://bedtools.readthedocs.org/en/latest/
+4. http://openmp.org/wp/
 
