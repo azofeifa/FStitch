@@ -59,25 +59,41 @@ The segments do not need to be in any order and can be from any chromosome, howe
 ###running FStitch train
 Running FStitch train is simple once you have your data in the correct format and have created the training file above. A description of the parameters for FStitch train are given below
 
-1. -i  = \</path/to/BedGraphFile> “BedGraph File from above”
-2. -j  = \</path/to/TrainingFile> “Training File from above”
-3. -o  = \</path/to/anyName> “TrainingParameterOutFile”
-4. -np = number “number of processors, default 8”
-5. -al = number “learning rate for newtons method, default 1”
-6. -cm = number “max number of iterations for Baum-Welch, default 100”
-7. -ct = number “convergence threshold for Baum Welch, default 0.01”
-8. -v  = no value “verbose output, recommended for first time users”
+1. -i	= \</path/to/BedGraphFile> “BedGraph File from above”
+2. -j	= \</path/to/TrainingFile> “Training File from above”
+3. -o	= \</path/to/anyName> “TrainingParameterOutFile”
+4. -np	= number “number of processors, default 8”
+5. -al	= number “learning rate for newtons method, default 1”
+6. -cm	= number “max number of iterations for Baum-Welch, default 100”
+7. -ct	= number “convergence threshold for Baum Welch, default 0.01”
+8. -v 	= no value “verbose output, recommended for first time users”
 Putting this together
 
-$/src/FStitch train -i \</path/to/BedGraphFile\> -j </path/to/TrainingFile> -o </path/to/anyName.out>
+$/src/FStitch train -i \</path/to/BedGraphFile\> -j \</path/to/TrainingFile> -o \</path/to/anyName.out>
 
 This will produce the a fie called anyName.out that will store the learned parameters for the logistic regression and HMM transition parameters need in “FStitch segment”. Below is one such output for anyName.out
 
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/ParameterOutFile.png)
 
-
-
 ##FStitch segment
+FStitch segment follows from FStitch train and takes as input the TrainingParameterOutFile (from above, \</path/to/anyName.out>) as input, along with the originally BedGraph file. A description of the parameters for FStitch segment are given below
+
+1. -i	= \</path/to/BedGraphFile> “BedGraph File from above”
+2. -j 	= \</path/to/anyName.out> “Training Parameter Out File from FStitch train call”
+3. -o	= \</path/to/anyName.bed> “A bed file that gives the regions considered active nascent transcription (or ChIP-seq peak) and noise
+4. -np 	= number “number of processors, default 8”
+5. -v	= no value, “if specified, verbose output, recommended for first time users”
+6. -s	= “+” or “-”
+
+Putting this together
+$/src/FStitch train -i \</path/to/BedGraphFile\> -j \</path/to/anyName.out> -o \</path/to/anyName.bed> -s +
+
+This will produce a file called anyName.bed, and can be imported into any genome browser, an example of the track output is given above in the “Usage and Output” section, here is what the text file looks like:
+
+![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/ClassificationsIGV.png)
+
+
+
 ###parameters
 ## Understanding and Interpreting Output
 ##References 
