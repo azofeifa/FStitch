@@ -11,15 +11,15 @@ The above IGV Snap shot displays the classifications given by FStitch. Color ‘
 ##Brief Overview of FStitch Commands
 Here are the minimal commands needed to run FStitch from start to finish; for greater detail see below.
 
-$FStitch train -i \</path/to/BedGraphFile\> -j \</path/to/TrainingFile><sup>*</sup>  -o \</path/to/Parameters.out>
+$FStitch train -i \</path/to/BedGraphFile\> -j \</path/to/TrainingFile> <sup>*</sup>  -o \</path/to/Parameters.out>
 
-$FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/Parameters.out> -o \</path/to/Classifications.bed> <sup>(**)</sup> -s +\-<sup>(***)</sup>
+$FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/Parameters.out> -o \</path/to/Classifications.bed> <sup>\**</sup> -s +\- <sup>\***</sup>
 
 <sup>*</sup>TrainingFile is created by the user, see below for details
 
-<sup>(**)</sup>Classifications.bed can be imported into any genome browser. 
+<sup>**</sup>Classifications.bed can be imported into any genome browser. 
 
-<sup>(***)</sup>When using stranded data like GRO-seq, FStitch runs on each strand separately, so created BedGraph files from bam files must be separated by strand accordingly, see below for detail 
+<sup>***</sup>When using stranded data like GRO-seq, FStitch runs on each strand separately, so created BedGraph files from bam files must be separated by strand accordingly, see below for detail 
 
 
 ##System Requirements
