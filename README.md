@@ -1,5 +1,5 @@
 #FStitch
-Below is README for compiling, running and understanding Fast Read Stitcher (FStitch). This software is written primarily for scientists looking to identify putative nascent transcripts _de novo_ in Global Run-On sequencing<sup>1</sup>. However, users may also find this package useful as a ChIP-seq peak caller.
+Below is the README for compiling, running and understanding Fast Read Stitcher (FStitch). This software is written primarily for scientists looking to identify putative nascent transcripts _de novo_ in Global Run-On sequencing<sup>1</sup>. However, users may also find this package useful as a ChIP-seq peak caller.
 
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/IGV_SNAP.png)
 
