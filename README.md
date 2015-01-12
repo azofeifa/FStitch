@@ -20,7 +20,7 @@ $FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/Parameters.out> -o \
 
 
 ##System Requirements
-FStitch is written in the C++ programming language and uses OpenMP<sup>4</sup> to parallelize portions of the program.  With this in mind, users will need to have a GCC compilers later than version 4.2 to compile and run FStitch. For mac users, downloading the latest Xcode will update the GCC compiler need be. To check you compiler version, 
+FStitch is written in the C++ programming language, with C++11 support and uses OpenMP<sup>4</sup> to parallelize portions of the program.  With this in mind, users will need to have a GCC compilers later than version 4.7 to compile and run FStitch. For mac users, downloading the latest Xcode will update the GCC compiler need be. To check you compiler version, 
 
 $gcc —-version
 
