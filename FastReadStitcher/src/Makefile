@@ -61,6 +61,9 @@ validate.o:
 		@${CXX} -c ${CXXFLAGS} ${PWD}/validate.cpp 
 		@echo Compiled validate
 		
+write.o:
+	@${CXX} -c ${CXXFLAGS} ${PWD}/write.cpp 
+	@echo Compiled write
 clean:
 	@rm -f *.o
 

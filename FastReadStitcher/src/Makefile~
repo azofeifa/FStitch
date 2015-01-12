@@ -5,7 +5,7 @@
 #***************************************************************************/
 
 CXX             = g++
-CXXFLAGS        = -Wno-unused-variable -Wno-non-virtual-dtor   -fopenmp -Wno-write-strings
+CXXFLAGS        = -Wno-unused-variable -Wno-non-virtual-dtor -std=c++11  -fopenmp -Wno-write-strings
 EXEC            = ${PWD}/FStitch
 ARCH  			= getconf LONG_BIT
 
