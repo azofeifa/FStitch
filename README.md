@@ -94,7 +94,7 @@ FStitch segment follows from FStitch train and takes as input the TrainingParame
 1. -i	= \</path/to/BedGraphFile> “BedGraph File from above”
 2. -j 	= \</path/to/anyName.out> “Training Parameter Out File from FStitch train call”
 3. -o	= \</path/to/anyName.bed> “A bed file that gives the regions considered active nascent transcription (or ChIP-seq peak) and noise”
-4. -r 	= \</path/to/UCSC_Table_Gene_Annotations> “UCSC gene annotation table file from [4]”
+4. -r 	= \</path/to/UCSC_Table_Gene_Annotations> “UCSC gene annotation table<sup>2</sup>”
 4. -np 	= number “number of processors, default 8”
 5. -v	= no value, “if specified, verbose output, recommended for first time users”
 6. -s	= “+” or “-”
