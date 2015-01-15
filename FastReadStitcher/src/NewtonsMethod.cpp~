@@ -7,11 +7,11 @@
 #include <unistd.h>
 #include <string>
 #include <cmath>
-
+#include <math.h>
 using namespace std;
 
 
-vector< vector<double> > transpose(vector<vector<double> > H){
+vector< vector<double> > transpose(vector<vector<double>> H){
 	//==============================================================
 	//	!!!!!!!!!!!!!!!This function is incomplete!!!!!!!!!!!!!!!
 	//	Only handles square matrices and vectors...
@@ -19,7 +19,7 @@ vector< vector<double> > transpose(vector<vector<double> > H){
 	int dim = H.size();
 	int k,l, temp;
 	if (dim ==1 ){ //this is just a row vector...make a column vector
-		vector<vector<double> > newH;
+		vector<vector<double>> newH;
 		for (int i = 0; i < H[0].size(); i ++){
 			newH.push_back(vector<double>(1));
 			newH[i][0] 	= H[0][i];
@@ -27,7 +27,7 @@ vector< vector<double> > transpose(vector<vector<double> > H){
 		return newH;
 	}
 	if (H[0].size() == 1 ){//this is just a column vector...make a row vector
-		vector<vector<double> > newH;
+		vector<vector<double>> newH;
 		newH.push_back(vector<double>(H.size()));
 		for (int i =0; i < H.size(); i++){
 			newH[0][i]=H[i][0];
@@ -62,16 +62,16 @@ double g(vector<double> x, vector<double> w){
 		sum+=x[i]*w[i];
 	}
 	double vl 	= exp(sum) / (1.0 + exp(sum));
-	if (std::isinf(exp(sum))){
+	if (isinf(exp(sum))){
 		return 1.0;
 	}
-	if (std::isnan(vl)){
+	if (isnan(vl)){
 		return 1.0;
 	}
 	return vl;
 }
 vector<vector<double> > gradient(vector< vector<double> > X, vector<int> Y,vector<double> W){
-	vector<vector<double> > gradient;
+	vector<vector<double>> gradient;
 	int N	= X.size(); //Number of Training Examples
 	int K	= W.size(); //Feature Dimensions
 	int i, j;
@@ -145,7 +145,7 @@ vector< vector<double> > identity(int dim){
 	}
 	return I;
 }
-vector<vector<double> > add_matrices(vector<vector<double> > A, vector<vector<double> > B ){
+vector<vector<double> > add_matrices(vector<vector<double>> A, vector<vector<double>> B ){
 	vector<vector<double> > C 	= identity(A.size());
 	for (int i =0; i <A.size(); i++){
 		for (int j =0; j <A[i].size();j++){
@@ -183,7 +183,7 @@ vector< vector<double> > concatenate(vector< vector<double> > A, vector< vector<
 	return A;
 
 }
-vector<vector<double> > matrix_mult(vector<vector<double> > A, vector<vector<double> > B){
+vector<vector<double>> matrix_mult(vector<vector<double>> A, vector<vector<double>> B){
 	int A_i 	= A.size();
 	int A_j 	= A[0].size();
 	//dimensions of matrix A is A_i x A_j
@@ -210,7 +210,7 @@ vector<vector<double> > matrix_mult(vector<vector<double> > A, vector<vector<dou
 	}
 	return H;
 }
-vector< vector<double> > inv(vector<vector<double> > H){ //uses gauss-jordon elimination
+vector< vector<double> > inv(vector<vector<double>> H){ //uses gauss-jordon elimination
 
 	//=======================================================================================================
 	//	This was kind of a bitch to write, but the matrix data structure is a vector of vectors
@@ -226,8 +226,8 @@ vector< vector<double> > inv(vector<vector<double> > H){ //uses gauss-jordon eli
 	int k	= 0;
 	int l	= 0;
 
-	vector< vector<double> > I = identity(dim);
-	vector< vector<double> > H_T = transpose(H);
+	vector< vector<double>> I = identity(dim);
+	vector< vector<double>> H_T = transpose(H);
 	H = concatenate(H,I);
 	double multiple;
 	vector<double> row1,row2, erow;
@@ -308,7 +308,7 @@ vector< vector<double> > inv(vector<vector<double> > H){ //uses gauss-jordon eli
 
 	//Now Just return the inverse
 
-	vector< vector<double> > INV;
+	vector< vector<double>> INV;
 	for (i = 0; i < H.size();i++){
 		INV.push_back(vector<double>(dim));
 		for (j = dim; j < H[i].size();j++){
@@ -318,7 +318,7 @@ vector< vector<double> > inv(vector<vector<double> > H){ //uses gauss-jordon eli
 
 	return INV;
 }
-double loglikelihood(vector<vector<double> >X,  vector<int> Y, vector<double> W){
+double loglikelihood(vector<vector<double>>X,  vector<int> Y, vector<double> W){
 	double ll = 0.0;
 
 	for (int i =0; i < X.size(); i++){
@@ -326,7 +326,7 @@ double loglikelihood(vector<vector<double> >X,  vector<int> Y, vector<double> W)
 	}
 	return ll;
 }
-double cost(vector<vector<double> >X,  vector<int> Y, vector<double> W){
+double cost(vector<vector<double>>X,  vector<int> Y, vector<double> W){
 	double COST		= 0.0;
 	int prediction 	= 0;
 	for (int i =0; i < X.size(); i++){
@@ -357,7 +357,7 @@ vector<double> NewtonsMethod(vector< vector<double> > X, vector<int> Y, bool ver
 	for (int i = 0; i < X[0].size(); i++){
 		W.push_back(0.0); 	//Initialize Starting Weights to Zero
 	}
-	vector< vector<double> > reg = identity(X[0].size());
+	vector< vector<double>> reg = identity(X[0].size());
 
 
 
@@ -368,10 +368,10 @@ vector<double> NewtonsMethod(vector< vector<double> > X, vector<int> Y, bool ver
 	//	loglikelihood converges
 	//========================================================================
 
-	vector<vector<double> > H;
-	vector<vector<double> > INV_H;
-	vector<vector<double> > G;
-	vector<vector<double> > current_gradient;
+	vector<vector<double>> H;
+	vector<vector<double>> INV_H;
+	vector<vector<double>> G;
+	vector<vector<double>> current_gradient;
 
 	int T							= 200;
 	int t							= 0;

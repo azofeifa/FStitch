@@ -5,7 +5,7 @@
 #***************************************************************************/
 
 CXX             = g++-4.9.0
-CXXFLAGS        = -Wno-unused-variable -Wno-non-virtual-dtor  -std=c++11 -fopenmp -Wno-write-strings
+CXXFLAGS        = -Wno-unused-variable -Wno-non-virtual-dtor -std=c++11  -fopenmp -Wno-write-strings
 EXEC            = ${PWD}/FStitch
 ARCH  			= getconf LONG_BIT
 
@@ -61,6 +61,9 @@ validate.o:
 		@${CXX} -c ${CXXFLAGS} ${PWD}/validate.cpp 
 		@echo Compiled validate
 		
+write.o:
+	@${CXX} -c ${CXXFLAGS} ${PWD}/write.cpp 
+	@echo Compiled write
 clean:
 	@rm -f *.o
 

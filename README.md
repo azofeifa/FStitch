@@ -20,7 +20,7 @@ $FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/Parameters.out> -o \
 
 
 ##System Requirements
-FStitch is written in the C++ programming language and uses OpenMP<sup>4</sup> to parallelize portions of the program.  With this in mind, users will need to have a GCC compilers later than version 4.2 to compile and run FStitch. For mac users, downloading the latest Xcode will update the GCC compiler need be. To check you compiler version, 
+FStitch is written in the C++ programming language, with C++11 support and uses OpenMP<sup>4</sup> to parallelize portions of the program.  With this in mind, users will need to have a GCC compilers later than version 4.7 to compile and run FStitch. For mac users, downloading the latest Xcode will update the GCC compiler need be. To check you compiler version, 
 
 $gcc —-version
 
@@ -61,7 +61,7 @@ The Fast Read Stitcher program is divided into two main commands: “train” an
 ##FStitch train
 FStitch uses two probabilistic models to classify regions of high read density that may be indicative of nascent transcription (GRO-seq) or a read coverage peak (ChIP-seq): Logistic Regression and a Hidden Markov Model. The logistic regression coefficients are estimated via a user defined label training file.  Sense we are classifying regions as signal or noise, FStitch requires regions of the genome that show characteristic transcription or high read dense profiles and regions of the genome that display noise or not a profile of nascent transcription or a read dense region. With this information, FStitch trains a logistic regression classifier and then couples it to a hidden markov model. The transition parameters for the HMM are learned via the Baum Welch algorithm and thus do not require user label training data.  
 
-In short, FStitch requires regions the user considers active transcription (or a peak) and regions considered inactive (simply noise). We note that the more regions provided to FStitch the more accurate the classifications however we have in Cross Validation<sup>1</sup> analysis that roughly 5-10 regions of active and inactive regions will yield highly accurate classifications. These regions are provided to FStitch using a specific file format with four columns separated by tabs: chromosome, genomic coordinate start, genomic coordinate stop, (0 if “noise” or 1 “inactive”). An example is given below:
+In short, FStitch requires regions the user considers active transcription (or a peak) and regions considered inactive (simply noise). We note that the more regions provided to FStitch the more accurate the classifications however we have in Cross Validation<sup>1</sup> analysis that roughly 5-10 regions of active and inactive regions will yield highly accurate classifications. These regions are provided to FStitch using a specific file format with four columns separated by tabs: chromosome, genomic coordinate start, genomic coordinate stop, (0 if “noise” or 1 “signal”). An example is given below:
 
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/TrainingFileImage2.png)
 
@@ -94,7 +94,7 @@ FStitch segment follows from FStitch train and takes as input the TrainingParame
 1. -i	= \</path/to/BedGraphFile> “BedGraph File from above”
 2. -j 	= \</path/to/anyName.out> “Training Parameter Out File from FStitch train call”
 3. -o	= \</path/to/anyName.bed> “A bed file that gives the regions considered active nascent transcription (or ChIP-seq peak) and noise”
-4. -r 	= \</path/to/UCSC_Table_Gene_Annotations> “UCSC gene annotation table file from [4]”
+4. -r 	= \</path/to/UCSC_Table_Gene_Annotations> “UCSC gene annotation table<sup>2</sup>”
 4. -np 	= number “number of processors, default 8”
 5. -v	= no value, “if specified, verbose output, recommended for first time users”
 6. -s	= “+” or “-”
