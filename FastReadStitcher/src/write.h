@@ -4,6 +4,6 @@
 #include <map>
 #include "BaumWelch.h"
 #include "viterbi.h"
-void writeTrainingFile(string, BW_OUT,double, double, double);
+void writeTrainingFile(string, BW_OUT,double, double, double, bool);
 void writeViterbiPaths(string, map<string, state*>, string, string);
 #endif

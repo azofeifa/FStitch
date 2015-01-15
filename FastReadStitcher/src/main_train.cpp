@@ -61,6 +61,7 @@ int run_main_train(paramsTrain PT){
 	string outFile 								= PT.params["-o"];
 	int num_proc 								= stoi(PT.params["-np"]);
 	bool verbose 								= not PT.params["-v"].empty();
+	bool ChIP 									= not PT.params["-chip"].empty();
 	//=================================================================
 	// parameters specific to Baum Welch and Newtons Method
 	double max_convergence 						= stof(PT.params["-cm"]);
@@ -109,7 +110,7 @@ int run_main_train(paramsTrain PT){
 	}
 	//=================================================================
 	//GET DATA FROM TRAINING INTERVALS 
-	run_out RO  								= run_grabTrainingExamples(R, ContigData);
+	run_out RO  								= run_grabTrainingExamples(R, ContigData, ChIP);
 	if (RO.EXIT){
 		cout<<"exiting..."<<endl;
 		return 0;
@@ -130,14 +131,14 @@ int run_main_train(paramsTrain PT){
 	}
 	//=================================================================
 	//BAUM WELCH ALG 
-	BW_OUT BWO 									= runBW(ContigData, W,max_convergence, convergence_threshold,learning_rate, verbose, num_proc, maxSeed);
+	BW_OUT BWO 									= runBW(ContigData, W,max_convergence, convergence_threshold,learning_rate, verbose, num_proc, maxSeed, ChIP);
 	if (verbose){
 		cout<<"done\n";
 		cout<<"Writing learned parameters                : ";
 		cout<<flush;
 	
 	}
-	writeTrainingFile(outFile, BWO, learning_rate, max_convergence, convergence_threshold);
+	writeTrainingFile(outFile, BWO, learning_rate, max_convergence, convergence_threshold, ChIP);
 	if (verbose){
 		cout<<"done\n";
 	}

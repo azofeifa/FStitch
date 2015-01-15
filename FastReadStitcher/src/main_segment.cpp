@@ -93,6 +93,7 @@ int run_main_segment(paramsSegment  PT){
 		cout<<"Reading in FStitch Training Out File: ";
 	}
 	RTOF RTOF_params 					= readTrainingOutFile(TrainingOutFile);	
+
 	if (RTOF_params.EXIT){
 		cout<<"exiting..."<<endl;
 		return 0;
@@ -100,6 +101,9 @@ int run_main_segment(paramsSegment  PT){
 	if (verbose){
 		cout<<"done"<<endl;
 		cout<<flush;
+	}
+	if (verbose){
+		cout<<"Training Set from ChIP Data         : "<<(bool(RTOF_params.ChIP)==1)<<endl;	
 	}
 	//=================================================================
 	//Read in BedGraph File by Chromosome
@@ -123,7 +127,7 @@ int run_main_segment(paramsSegment  PT){
 		cout<<"Running Viterbi                     : ";
 		cout<<flush;
 	}
-	map<string, state*> results 	= runViterbi(ContigData, RTOF_params.W, RTOF_params.A,num_proc);
+	map<string, state*> results 	= runViterbi(ContigData, RTOF_params.W, RTOF_params.A,num_proc, RTOF_params.ChIP);
 	if (verbose){
 		cout<<"done"<<endl;
 		cout<<flush;

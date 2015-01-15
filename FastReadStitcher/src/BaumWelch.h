@@ -15,10 +15,10 @@ public:
 	BW_OUT();
 };
 
-BW_OUT runBW(map<string,contig *>, vector<double>, double, double, double, bool, int, int );
+BW_OUT runBW(map<string,contig *>, vector<double>, double, double, double, bool, int, int, bool );
 void GAMMA(double ** , double ** , int ,double **);
 void backward(double ** ,  double ** , int ,double ** );
 void forward(double ** , double ** , int , double **  );
-void emissions(contig *, vector<double> , int , double **);
+void emissions(contig *, vector<double> , int , double **, bool);
 
 #endif

@@ -34,7 +34,7 @@ double getEmit(vector<double> x, vector<double> W, int k){
 	}
 }
 
-map<string, state *> runViterbi(map<string,contig *> ContigData, vector<double> W, vector<vector<double>> a, int np){
+map<string, state *> runViterbi(map<string,contig *> ContigData, vector<double> W, vector<vector<double>> a, int np, bool ChIP){
 	typedef map<string,contig *>::iterator c_it;
 	static double pi 	= 0.5;
 	static double *  A[2];
@@ -75,7 +75,7 @@ map<string, state *> runViterbi(map<string,contig *> ContigData, vector<double> 
 		alpha[0] 	= new double[T], alpha[1] 	= new double[T];
 		double * G[2];
 		G[0] 	= new double[T], G[1] = new double[T];
-		emissions(root, W, T,bj);
+		emissions(root, W, T,bj, ChIP);
 		forward(A,bj, T,alpha);
 		backward(A, bj, T,beta);
 		GAMMA(alpha, beta, T,G);
@@ -86,7 +86,7 @@ map<string, state *> runViterbi(map<string,contig *> ContigData, vector<double> 
 		sum=0, max=0, emit 	= 0;
 		state * argmax 		= NULL;
 		while(C){
-			x 		= C->getVect();
+			x 		= C->getVect(ChIP);
 			for (int i =0; i <2;i++){
 				emit= getEmit(x,W,i);
 				if (not  t){

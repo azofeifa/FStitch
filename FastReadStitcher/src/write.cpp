@@ -13,7 +13,7 @@ static char *getDtTm (char *buff) {
     strftime (buff, DTTMSZ, DTTMFMT, localtime (&t));
     return buff;
 }
-void writeTrainingFile(string OUT,BW_OUT BWO, double alpha, double cm, double ct){
+void writeTrainingFile(string OUT,BW_OUT BWO, double alpha, double cm, double ct, bool ChIP){
 	ofstream FHW;
 	FHW.open(OUT);
 	if (FHW){	
@@ -25,6 +25,7 @@ void writeTrainingFile(string OUT,BW_OUT BWO, double alpha, double cm, double ct
 		FHW<<"#Learning Rate                   :"<<to_string(alpha)<<endl;
 		FHW<<"#Max Iterations                  :"<<to_string(cm)<<endl;
 		FHW<<"#Convergence Threshold           :"<<to_string(ct)<<endl;
+		FHW<<"#ChIP Data                       :"<<to_string(ChIP)<<endl;
 		FHW<<"#####################################################"<<endl;
 		string weights= "";
 		string transitions = "";

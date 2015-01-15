@@ -14,6 +14,6 @@ public:
 	run_out();
 };
 map<string,T> makeIntervalTree(map<string, interval *>);
-run_out run_grabTrainingExamples(map<string,T>, map<string,contig *>);
+run_out run_grabTrainingExamples(map<string,T>, map<string,contig *>, bool);
 
 #endif

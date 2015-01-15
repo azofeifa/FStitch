@@ -22,14 +22,14 @@ public:
 		p=P;
 	} 
 };
-void emissions(contig * dd, vector<double>W, int T, double ** bj){
+void emissions(contig * dd, vector<double>W, int T, double ** bj, bool ChIP){
 	contig * d = dd;
 	for (int t =0; t< T; t++){
 		for (int i =0;i <2; i++){
 			if (i==1){
-				bj[i][t] 	= g(d->getVect(), W);
+				bj[i][t] 	= g(d->getVect(ChIP), W);
 			}else{
-				bj[i][t] 	= 1.0 - g(d->getVect(), W);
+				bj[i][t] 	= 1.0 - g(d->getVect(ChIP), W);
 			}
 		}
 		d=d->next;
@@ -193,7 +193,7 @@ BW_OUT::BW_OUT(bool c, double ll, vector<double> w, double ** a){
 	A 			= aa;
 }
 BW_OUT::BW_OUT(){}
-BW_OUT runBW(map<string,contig *> D, vector<double> W, double cm, double ct, double learning_rate, bool verbose, int np, int maxSeed){
+BW_OUT runBW(map<string,contig *> D, vector<double> W, double cm, double ct, double learning_rate, bool verbose, int np, int maxSeed, bool ChIP){
 	vector<BW_OUT> ALL(maxSeed);
 	omp_set_dynamic(0);     // Explicitly disable dynamic teams
 	omp_set_num_threads(np); // Use 4 threads for all consecutive parallel regions
@@ -208,7 +208,7 @@ BW_OUT runBW(map<string,contig *> D, vector<double> W, double cm, double ct, dou
 		//====================================================================
 		// Get length of linked list and put into vector<vector<double>>  
 		while (X){
-			dataX.push_back(X->getVect());
+			dataX.push_back(X->getVect(ChIP));
 			X 				= X->next;
 			t++;
 		}
@@ -244,7 +244,7 @@ BW_OUT runBW(map<string,contig *> D, vector<double> W, double cm, double ct, dou
 		bool converged 	= 0;
 		
 		while (not converged and k < cm){
-			emissions(root, W, t,bj);
+			emissions(root, W, t,bj, ChIP);
 			forward(A,bj, t,alpha);
 			backward(A, bj, t,beta);
 			GAMMA(alpha, beta, t,G);

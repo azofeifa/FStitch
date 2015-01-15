@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "read_in_parameters.h"
 using namespace std;
 paramWrapper::paramWrapper(){}
@@ -38,9 +39,7 @@ paramsTrain::paramsTrain(){
 	params["-ct"] 	= "0.1";
 	params["-al"] 	= "1";
 	params["-ms"] 	= "20";
-
-
-
+	params["-chip"] = "";
 }
 void paramsTrain::display(){
 	cout<<"BedGraph File  : "<<params["-i"]<<endl
@@ -62,6 +61,10 @@ void paramsTrain::display(){
 	if (params["-al"]!="1"){
 	cout<<"learning rate (user defined): "<<params["-ct"]<<endl;
 	}
+	if (not params["-chip"].empty()){
+	cout<<"ChIP Data      : True"<<endl;
+	}
+
 
 
 
@@ -75,6 +78,7 @@ paramsSegment::paramsSegment(){
 	params["-r"] 	= "";
 	params["-v"] 	= "";
 	params["-s"] 	= "";
+	params["-chip"] = "";
 }
 void paramsSegment::display(){
 	cout<<"BedGraph File    : "<<params["-i"]<<endl
@@ -85,7 +89,7 @@ void paramsSegment::display(){
 		}
 	if (not params["-v"].empty()){
 	cout<<"verbose output   : True"<<endl;
-		}
+	}
 }
 paramsERNA::paramsERNA(){
 	params["-i"] 	= "";
@@ -117,6 +121,7 @@ void fillInOptions(char* argv[],paramWrapper * P){
 		if ((*argv)[0] == COM[0]){
 			F 	= string(*argv); 
 		}
+		transform(F.begin(), F.end(), F.begin(), ::tolower);
 		if (not F.empty()) {
 			if (segment && P->PS.params.find(F) !=P->PS.params.end()){
 				P->PS.params[F]=string(*argv);
@@ -140,6 +145,10 @@ paramWrapper* readInParameters( char* argv[]){
 	string userModParameter = "";
 	paramWrapper 	* P;
 	argv = ++argv;
+	if (not *argv){
+		cout<<"please specify either: train or segment"<<endl;
+		return P;
+	}
 	if (string(*argv) == "train") {
  		P->train = 1;
  	}

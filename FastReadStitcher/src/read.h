@@ -14,7 +14,7 @@ public:
 	contig();
 	void setStats(int , int , double , double , double, float , string);
 	void display();
-	vector<double> getVect();
+	vector<double> getVect(bool);
 };
 class interval{
 public:
@@ -29,8 +29,9 @@ class RTOF{
 public:
 	vector<double> W;
 	vector<vector<double>> A;
+	bool ChIP;
 	bool EXIT;
-	RTOF(vector<double>,vector<vector<double>>);
+	RTOF(vector<double>,vector<vector<double>>, bool);
 	RTOF();
 
 };

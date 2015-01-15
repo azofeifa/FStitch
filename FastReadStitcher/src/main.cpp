@@ -14,7 +14,10 @@ using namespace std;
 int main(int argc, char* argv[]) {
 	paramWrapper * P = new paramWrapper();
 	P 				= readInParameters(argv);
-
+	if (P==NULL){
+		cout<<"exiting..."<<endl;
+		delete P;
+	}
 	if (P->train){
 		paramsTrain PT = P->PT;
 		if (not PT.params["-v"].empty()){

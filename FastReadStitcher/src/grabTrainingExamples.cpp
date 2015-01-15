@@ -22,7 +22,7 @@ run_out::run_out(vector< vector<double> > x, vector<int> y){
 run_out::run_out(){
 	EXIT=true;
 }
-run_out run_grabTrainingExamples(map<string,T> intervals, map<string,contig *> Data){
+run_out run_grabTrainingExamples(map<string,T> intervals, map<string,contig *> Data, bool ChIP){
 	typedef map<string,contig *>::iterator it;
 	vector<interval> F;
 	int i = 0;
@@ -50,7 +50,7 @@ run_out run_grabTrainingExamples(map<string,T> intervals, map<string,contig *> D
 					else{
 						k 	= stoi(F[0].info);
 						Y.push_back(k);
-						X.push_back(C->getVect());
+						X.push_back(C->getVect(ChIP));
 					}
 				}
 				C 	= C->next;

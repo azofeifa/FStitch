@@ -20,5 +20,5 @@ public:
 	state(int , double, int, int, int,string);
 };
 
-map<string, state *> runViterbi(map<string,contig *> , vector<double> , vector<vector<double>>, int );
+map<string, state *> runViterbi(map<string,contig *> , vector<double> , vector<vector<double>>, int , bool);
 #endif

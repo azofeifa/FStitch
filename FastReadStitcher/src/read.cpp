@@ -70,12 +70,18 @@ void contig::setStats(int st, int sp, double l, double r, double len, float C, s
 void contig::display(){
 	cout<<chrom<<":"<<start<<"-"<<stop<<endl;
 }
-vector<double> contig::getVect(){
-	vector<double> x(4);
-	x[0] 	= 1;
-	x[1]	= log((left+right)/2);
-	x[2]	= log(length);
-	x[3] 	= log(cov);
+vector<double> contig::getVect(bool ChIP){
+	vector<double> x;
+	if (not ChIP){
+		x.push_back(1);
+		x.push_back(log((left+right)/2));
+		x.push_back(log(length));
+		x.push_back(log(cov/ (left+right+length)));
+	}else{
+		x.push_back(1);
+		x.push_back(cov / (length+ ((left+right)/2) ));
+		x.push_back(cov);
+	}
 	return x;
 }
 class contigOut{
@@ -133,7 +139,7 @@ contigOut makeContig(string FILE, int start, int stop){
 				prevStart 	= 0;
 			}else if(not begin and (st-p)>2 ){
 				r 			= st - p;
-				C->setStats(prevStart-l,p+r, l, r, p-prevStart, coverage/(l+r+(p-prevStart)), chrom);
+				C->setStats(prevStart-l,p+r, l, r, p-prevStart, coverage, chrom);
 				C->next 	= new contig;
 				C 			= C->next;
 				prevStart 	= st;
@@ -321,9 +327,10 @@ map<string, map<string, interval *>> readRefSeq(string FILE){
 	
 	return R;
 }
-RTOF::RTOF(vector<double> w, vector<vector<double>> a){
+RTOF::RTOF(vector<double> w, vector<vector<double>> a, bool CH){
 		W=w,A=a;
 		EXIT=false;
+		ChIP=CH;
 }
 RTOF::RTOF(){
 	EXIT=true;
@@ -336,6 +343,7 @@ RTOF readTrainingOutFile(string FILE){
 	vector<vector<double>> A;
 	vector<string> lineArray;
 	bool begin 	= 1;
+	bool ChIP 	= 0;
 	if (FH){
 		while (getline(FH,line)){
 			if (begin and ("#" != line.substr(0,1) ) ){
@@ -343,7 +351,12 @@ RTOF readTrainingOutFile(string FILE){
 				cout<<"This is not an output training file\nfrom the fast read stitcher"<<endl;
 				return ROOT;
 			}
+
 			begin = false;
+			if ("#ChIP" == line.substr(0,5)){
+				lineArray 		= splitter(line, ":");
+				ChIP 			= (lineArray[1]=="1");
+			}
 			if ("#" != line.substr(0,1)){
 				lineArray 		= splitter(line, ":");
 				if (lineArray[0].substr(0,1)=="L"){
@@ -370,7 +383,7 @@ RTOF readTrainingOutFile(string FILE){
 		cout<<"\""<<FILE<<"\""<<" doesn't exist, exiting..."<<endl;
 	}
 	FH.close();
-	return RTOF(W,A);
+	return RTOF(W,A, ChIP);
 }
 
 
