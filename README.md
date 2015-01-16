@@ -77,6 +77,7 @@ Running FStitch train is simple once you have your data in the correct format an
 6. -cm	= number “max number of iterations for Baum-Welch, default 100”
 7. -ct	= number “convergence threshold for Baum Welch, default 0.01”
 8. -v 	= no value “verbose output, recommended for first time users”
+9. -ChIP= no value "feature selection optimized for ChIP datasets"
 Putting this together
 
 $/src/FStitch train -i \</path/to/BedGraphFile\> -j \</path/to/TrainingFile> -o \</path/to/anyName.out>
