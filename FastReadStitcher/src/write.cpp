@@ -145,12 +145,18 @@ void writeViterbiPaths(string OUT, map<string, state*> results, string refFile, 
 					}else{
 						genes 		= "";	
 					}
+					if (prevState=="ON" and C){
+						prevStop 	= C->start;
+					}
 					FHW<<C->chrom<<"\t"<<to_string(prevStart)<<"\t"<<to_string(prevStop)<<"\t"<<prevState<<"="<<to_string(currProb/N);
 					FHW<<"\t"<<score<<"\t"<<strand<<"\t"<<to_string(prevStart)<<"\t"<<to_string(prevStop)<<"\t"<<RGB<<"\t"<<genes<<endl;
 					currProb=0;
 					N 		=0;
 				}
 				prevStart = C->start;
+				if (C->ID=="ON"){
+					prevStart=prevStop;
+				}
 				N++;
 				currProb+=C->prob;
 			}
