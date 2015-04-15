@@ -98,7 +98,7 @@ FStitch segment follows from FStitch train and takes as input the TrainingParame
 4. -r 	= \</path/to/UCSC_Table_Gene_Annotations> “UCSC gene annotation table<sup>2</sup>”
 4. -np 	= number “number of processors, default 8”
 5. -v	= no value, “if specified, verbose output, recommended for first time users”
-6. -s	= “+” or “-”
+6. -s	= “forward/pos” or “reverse/neg”
 
 Putting this together
 $/src/FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/anyName.out> -o \</path/to/anyName.bed> -s +
