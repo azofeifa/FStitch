@@ -41,6 +41,10 @@ file_stats getFHstats(string FILE){
 	int i=0; 
 	if (FH){
 		while (getline(FH,line)){
+			if (!line.empty() && line[line.size() - 1] == '\r'){
+				line.erase(line.size() - 1);
+			}
+			
 			chrom = getChrom(line);
 			if (prev!=chrom){
 				start_stop.push_back(FH.tellg());
@@ -113,6 +117,10 @@ contigOut makeContig(string FILE, int start, int stop){
 
 	while (FH.tellg()<stop){
 		getline(FH,line);
+		if (!line.empty() && line[line.size() - 1] == '\r'){
+			line.erase(line.size() - 1);
+		}
+			
 		lineArray 	= splitter(line, "\t");
 		if (lineArray.size()!=4){
 			cout<<endl;
@@ -182,16 +190,17 @@ readTrainingFileReturn readTrainingFile(string FILE){
 	vector<string>lineArray;
 	if (FH){
 		while (getline(FH, line)){
-			lineArray 			= splitter(line, "\t");
+			if (!line.empty() && line[line.size() - 1] == '\r'){
+				line.erase(line.size() - 1);
+			}
+			lineArray 			= splitter2(line, "\t");
 			if (lineArray.size()!=4){
 				cout<<"Line: "<<line<<", in training file is not formatted properly, tab delimited"<<endl;
 				RETURN.EXIT 	= true;
 				return RETURN;
 			}
-
 			if (not (lineArray[3]=="0" or lineArray[3]=="1")){
-				cout<<endl;
-				cout<<"Line: "<<line<<", must have training label as either 0 or 1"<<endl;
+				printf("HERE???\n" );
 				RETURN.EXIT 	= true;
 				return RETURN;
 			}
@@ -299,6 +308,10 @@ map<string, map<string, interval *>> readRefSeq(string FILE){
 		vector<string> lineArray;
 		if (FH){
 			while (getline(FH,line)){
+				if (!line.empty() && line[line.size() - 1] == '\r'){
+					line.erase(line.size() - 1);
+				}
+			
 				lineArray 	= splitter(line, "\t");
 				chrom 		= lineArray[2], strand = lineArray[3], ID=lineArray[1];
 				start 		= stoi(lineArray[4]), stop=stoi(lineArray[5]);
@@ -346,6 +359,10 @@ RTOF readTrainingOutFile(string FILE){
 	bool ChIP 	= 0;
 	if (FH){
 		while (getline(FH,line)){
+			if (!line.empty() && line[line.size() - 1] == '\r'){
+				line.erase(line.size() - 1);
+			}
+			
 			if (begin and ("#" != line.substr(0,1) ) ){
 				RTOF ROOT;
 				cout<<"This is not an output training file\nfrom the fast read stitcher"<<endl;
