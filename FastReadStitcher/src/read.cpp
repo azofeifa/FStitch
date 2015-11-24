@@ -200,7 +200,7 @@ readTrainingFileReturn readTrainingFile(string FILE){
 				return RETURN;
 			}
 			if (not (lineArray[3]=="0" or lineArray[3]=="1")){
-				printf("HERE???\n" );
+				printf("Line: %s, must contain either 0 or 1 as training input\n",line.c_str() );
 				RETURN.EXIT 	= true;
 				return RETURN;
 			}
