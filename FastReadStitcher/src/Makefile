@@ -4,7 +4,7 @@
 #**    Description: Makefile for FastReadStitcher                          */
 #***************************************************************************/
 
-CXX             = g++-5.1.0
+CXX             = g++
 CXXFLAGS        = -Wno-unused-variable -Wno-non-virtual-dtor -std=c++11  -fopenmp -Wno-write-strings
 EXEC            = ${PWD}/FStitch
 ARCH  			= getconf LONG_BIT
