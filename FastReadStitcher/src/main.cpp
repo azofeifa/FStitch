@@ -13,10 +13,11 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 	paramWrapper * P = new paramWrapper();
-	P 				= readInParameters(argv);
+	readInParameters(argv, P);
 	if (P==NULL){
 		cout<<"exiting..."<<endl;
 		delete P;
+		return 0;
 	}
 	if (P->train){
 		paramsTrain PT = P->PT;

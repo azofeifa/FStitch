@@ -36,9 +36,7 @@ public:
 };
 class paramWrapper{
 public:
-	bool train 	=0;
-	bool segment=0;
-	bool eRNA 	=0;
+	bool train, segment, eRNA, EXIT; 
 	paramsTrain PT ; 
 	paramsSegment PS; 
 	paramsERNA PE ; 
@@ -49,6 +47,6 @@ public:
 
 void fillInOptions(char*,paramWrapper);
 
-paramWrapper * readInParameters(char**);
+void readInParameters(char**, paramWrapper *);
 
 #endif

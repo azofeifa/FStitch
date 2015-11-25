@@ -6,7 +6,9 @@
 #include <algorithm>
 #include "read_in_parameters.h"
 using namespace std;
-paramWrapper::paramWrapper(){}
+paramWrapper::paramWrapper(){
+	train = 0, segment = 0, eRNA = 0, EXIT = 0;	
+}
 void paramWrapper::display(){
 	
 	cout<<"============================================================="<<endl
@@ -141,29 +143,32 @@ void fillInOptions(char* argv[],paramWrapper * P){
 
 
 
-paramWrapper* readInParameters( char* argv[]){	
+void readInParameters( char* argv[], paramWrapper * P){	
 	string userModParameter = "";
-	paramWrapper 	* P;
 	argv = ++argv;
 	if (not *argv){
 		cout<<"please specify either: train or segment"<<endl;
-		return P;
+		P->EXIT = 1;
 	}
-	if (string(*argv) == "train") {
- 		P->train = 1;
- 	}
-	else if (string(*argv) == "segment") {
-		P->segment = 1;
+	if (not P->EXIT){
+		string F 	= *argv;
+		if (F.size()==5 and F.substr(0,5) == "train") {
+			P->train = 1;
+	 	}
+		else if (F.size()==7 and  F.substr(0,7) == "segment") {
+			P->segment = 1;
+		}
+		else if (F.size()==4 and  F.substr(0,4) == "eRNA") {
+			P->eRNA = 1;		
+		}else{
+			cout<<"couldn't understand user provided option: "<<" "<<F<<endl;
+			P->EXIT = 1;
+		}
+		if (not P->EXIT){
+			argv = ++argv;
+			fillInOptions(argv, P);
+		}
 	}
-	else if (string(*argv) == "eRNA") {
-		P->eRNA = 1;		
-	}else{
-		cout<<"couldn't understand user provided option..."<<endl;
-		return P;
-	}
-	argv = ++argv;
-	fillInOptions(argv, P);
-	return P;
 }
 
 
