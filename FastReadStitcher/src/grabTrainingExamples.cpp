@@ -67,41 +67,7 @@ run_out run_grabTrainingExamples(map<string,T> intervals, map<string,contig *> D
 			zero++;
 		}
 	}
-	double N = one+zero;
-	default_random_engine generator;
-	uniform_real_distribution<double> distribution(0.0,1.0);
-	double U;
-	double ratio;
-	if (one > zero){
-		ratio 	= one / N;
-	}else{
-		ratio 	= zero / N;
-	}
-	vector<vector<double>> newX;
-	vector<int> newY;
-	double one_one 		= 0;
-	double zero_zero  	= 0;
-	for (int i =0 ; i < Y.size(); i++){
-		U = distribution(generator);
-		if (U > ratio && ( (one > zero && Y[i]==1 ) || (one < zero && Y[i]==0 )  )){
-			newY.push_back(Y[i]);
-			newX.push_back(X[i]);	
-			if (Y[i]){
-				one_one++;
-			}else{
-				zero_zero++;
-			}
-		}else if (( (one > zero && Y[i]==0 ) || (one < zero && Y[i]==1 )  ) ) {
-			newY.push_back(Y[i]);
-			newX.push_back(X[i]);
-			if (Y[i]){
-				one_one++;
-			}else{
-				zero_zero++;
-			}
-		}
-	}
-	return run_out(newX,newY);
+	return run_out(X,Y);
 
 
 }

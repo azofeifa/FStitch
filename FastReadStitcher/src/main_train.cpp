@@ -111,8 +111,9 @@ int run_main_train(paramsTrain PT){
 	//=================================================================
 	//GET DATA FROM TRAINING INTERVALS 
 	run_out RO  								= run_grabTrainingExamples(R, ContigData, ChIP);
-	if (RO.EXIT){
+	if (RO.EXIT or RO.X.empty() or RO.Y.empty()){
 		cout<<"exiting..."<<endl;
+		cout<<"No training data was found in the provided intervals"<<endl;
 		return 0;
 	}
 	if (verbose){

@@ -39,6 +39,7 @@ file_stats getFHstats(string FILE){
 	string chrom;
 	string prev="";
 	int i=0; 
+	int LAST 	= 0;
 	if (FH){
 		while (getline(FH,line)){
 			if (!line.empty() && line[line.size() - 1] == '\r'){
@@ -52,13 +53,15 @@ file_stats getFHstats(string FILE){
 				i++;
 			}
 			prev=chrom;
+			LAST 	= FH.tellg();
 		}
 
 	}else{
 		cout<<"\""<<FILE<<"\""<<" doesn't exist, exiting..."<<endl;
 	}
-	start_stop.push_back(FH.tellg());
+	start_stop.push_back(LAST);
 	FH.close();
+
 	return file_stats(start_stop, relate);
 }
 contig::contig(){}
@@ -98,6 +101,7 @@ public:
 contigOut makeContig(string FILE, int start, int stop){
 	contigOut CO;
 	ifstream FH(FILE);
+
 	FH.seekg(start);
 	string line, chrom;
 	vector<string> lineArray;
@@ -140,14 +144,15 @@ contigOut makeContig(string FILE, int start, int stop){
 			sp 		= stoi(lineArray[2]);
 			st 		= stoi(lineArray[1]);
 			cov 	= stof(lineArray[3]);
+
 			if (begin){
 				begin 		= 0;
 				prevStop	= sp;
 				l 			= sp-prevStop;
-				prevStart 	= 0;
+				prevStart 	= st;
 			}else if(not begin and (st-p)>2 ){
 				r 			= st - p;
-				C->setStats(prevStart-l,p+r, l, r, p-prevStart, coverage, chrom);
+				C->setStats(prevStart,p, l, r, p-prevStart, coverage, chrom);
 				C->next 	= new contig;
 				C 			= C->next;
 				prevStart 	= st;
@@ -241,12 +246,13 @@ map<string,contig *> readBedGraphFile(string FILE, map<string, interval *> T, bo
 	map<string,contig *> 	D;
 	vector<contig *> M(start_stop.size());
 	int nthreads 					= omp_get_max_threads();
+
 	bool abort = false;
 	#pragma omp parallel for
 	for(int n=1; n<start_stop.size(); ++n)
 	{
 		#pragma omp flush (abort)
-		if (T.find(relate[n-1])!=T.end()){
+		if (T.find(relate[n-1])!=T.end() ){
 			contigOut CO 	= makeContig(FILE, start_stop[n-1],start_stop[n]);
 			if (CO.EXIT){
 				D.clear();
