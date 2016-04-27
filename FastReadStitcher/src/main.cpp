@@ -14,6 +14,7 @@ using namespace std;
 int main(int argc, char* argv[]) {
 	paramWrapper * P = new paramWrapper();
 	readInParameters(argv, P);
+	
 	if (P==NULL){
 		cout<<"exiting..."<<endl;
 		delete P;

@@ -42,6 +42,7 @@ public:
 	paramsERNA PE ; 
 	paramWrapper();
 	void display();
+	void help();
 };
 
 

@@ -249,12 +249,12 @@ BW_OUT runBW(map<string,contig *> D, vector<double> W, double cm, double ct, dou
 			backward(A, bj, t,beta);
 			GAMMA(alpha, beta, t,G);
 			EPSILON(alpha, beta, bj, A, t,E);
-			if (begin){
-				subSampleOut SS 	= subsample(decode( G, t), dataX, 2000);
-				//this is to get a broader more diverse range of values to learn on
-				W 					= learn(SS.XX, SS.YY, 0, learning_rate); //learned logistic regression parameters
-				begin 				= 0;
-			}
+			// if (begin){
+			// 	subSampleOut SS 	= subsample(decode( G, t), dataX, 2000);
+			// 	//this is to get a broader more diverse range of values to learn on
+			// 	W 					= learn(SS.XX, SS.YY, 0, learning_rate); //learned logistic regression parameters
+			// 	begin 				= 0;
+			// }
 			double NN,DD;
 			for (int i =0; i <2; i++){
 				NN=0, DD=sumArray(G[i],t-1);
@@ -294,3 +294,24 @@ BW_OUT runBW(map<string,contig *> D, vector<double> W, double cm, double ct, dou
 	return maxBWO;
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

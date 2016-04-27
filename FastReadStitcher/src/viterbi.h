@@ -20,5 +20,7 @@ public:
 	state(int , double, int, int, int,string);
 };
 
-map<string, state *> runViterbi(map<string,contig *> , vector<double> , vector<vector<double>>, int , bool);
+vector<int> runViterbi(vector<vector<double>> , vector<double> , vector<vector<double>>);
+vector<vector<double>> learn_transition_parameters(vector<double> ,vector<vector<double>> , vector<int> );
+map<string, map<string, vector<segment *> >> run_viteribi_across(map<string, segment * > , vector<double> , vector<vector<double>> );
 #endif

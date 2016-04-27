@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
+#include <random>
+
 #include <numeric>
 #include <unistd.h>
 #include <string>
@@ -407,33 +409,11 @@ vector<double> NewtonsMethod(vector< vector<double> > X, vector<int> Y, bool ver
 		W 					= add(mult(W, 1-alpha), mult(gamma, alpha) );
 
 		LL 					= loglikelihood(X,Y,W);
-		if (verbose){
-			cout<<"...Learning..."<<flush;
-			if (ct > 3){
-				cout<<endl;
-				ct=0;
-			}
-
-//			for (int i=0; i < W.size(); i++){
-//				cout<<to_string(W[i]).substr(0,10)<<"\t";
-//			}
-//			cout<<endl;
-		}
+		
 		ct++;
 		t++;
 		if(ptr != NULL && abs(difference(W,P_W)) < convergence_threshold){
-			if (verbose){
-
-
-
-				cout<<"\n...Newton's Method converged in "<<t<<" iterations"<<endl;
-				cout<<"...Learned Logistic Regression Parameters: ";
-				for (int i=0; i < W.size(); i++){
-					cout<<to_string(W[i]).substr(0,10)<<"\t";
-				}
-
-				cout<<endl;
-			}
+			
 			return W;
 		}
 		*ptr = LL;
@@ -443,28 +423,113 @@ vector<double> NewtonsMethod(vector< vector<double> > X, vector<int> Y, bool ver
 		}
 	}
 	cout<<"Warning: Learning Algorithm did not converge..."<<endl;
-	cout<<"Consider increasing number of iterations or lowering convergence threshold..."<<endl;
-	cout<<"Learned Logistic Regression Parameters: ";
-	for (int i=0; i < W.size(); i++){
-		cout<<W[i]<<"\t";
-	}
-	cout<<endl;
-
+	cout<<"Consider increasing number of maximum iterations..."<<endl;
 	return W;
+}
+
+
+
+void get_rand_sample(vector< vector<double> > X, vector<int> Y,
+		vector< vector<double> > & nX, vector<int> & nY,
+		vector< vector<double> > & tnX, vector<int> & tnY, double PROP){
+	
+	double ON=0, OFF=0;
+	
+	for (int s = 0 ; s < Y.size(); s++){
+		if (Y[s]>0){
+			ON++;
+		}else{
+			OFF++;
+		}
+	}
+	double prop 	= ON / (ON + OFF);
+	random_device rd;
+	mt19937 mt(rd());
+	uniform_real_distribution<double> dist(0, 1);
+	ON 	= 0, OFF = 0;
+	for (int s = 0 ; s < Y.size(); s++){
+		if (dist(mt) < PROP){
+			if (Y[s] > 0 and dist(mt) < (1.0 - prop)){
+				nX.push_back(X[s]);
+				nY.push_back(Y[s]);
+				ON++;
+			}else if(Y[s] <1 and dist(mt) > (1.0 - prop) ){
+				nX.push_back(X[s]);
+				nY.push_back(Y[s]);
+				OFF++;
+			}
+		}else{
+			if (Y[s] > 0 and dist(mt) < (1.0 - prop)){
+				tnX.push_back(X[s]);
+				tnY.push_back(Y[s]);
+			}
+			else if(Y[1] < 1 and dist(mt) < prop ){
+				tnX.push_back(X[s]);
+				tnY.push_back(Y[s]);
+			}
+		}
+	}
+}
+
+double get_f1(vector<double> W, vector<vector<double>> X, vector<int> Y){
+	double tp=0, fp=0,tn=0,fn=0;
+	double prob 	=0;
+	double P = 0, N = 0;
+	for (int i =0 ; i  < X.size(); i++ ){
+		prob 	= g(X[i],W);
+		if (prob > 0.5 and Y[i] > 0){
+			P++;
+			tp++;
+		}else if(prob > 0.5 and Y[i] < 1){
+			N++;
+			fp++;
+		}else if (prob < 0.5 and Y[i] < 1){
+			N++;
+			tn++;
+		}else{
+			fn++;
+			P++;
+		}
+	}
+	double precision 	= tp / P , recall 	= tn / N ;
+	double f1 	= 2*precision*recall/(precision+ recall);
+	return f1;
 
 
 }
 
 
+vector<double> learn(vector< vector<double> > X, vector<int> Y, bool verbose, 
+	double alpha, double & final_f1){
+	vector<double> W;
+	double F1=0;
+	double N = 0;
+	vector<double> best_W;
+	double argFI = 0;
+	for (int i = 0 ; i < 50; i++){
+		vector< vector<double> >  nX;
+		vector<int> nY;
+		vector< vector<double> > tnX;
+		vector<int>  tnY;
+		get_rand_sample(X, Y,nX, nY, tnX, tnY,0.8);
+		W 	= NewtonsMethod(nX,nY, verbose,alpha);
+		double f1 	= get_f1(W,  X,  Y);
+		if (f1 > argFI ){
+			best_W 	= W, argFI = f1;
+		}
+		F1+=f1;
+		N+=1;
 
+	}
+	F1/=N;
+	vector< vector<double> >  nX;
+	vector<int> nY;
+	vector< vector<double> > tnX;
+	vector<int>  tnY;
+	get_rand_sample(X, Y,nX, nY, tnX, tnY,1.0);
 
-
-
-
-
-vector<double> learn(vector< vector<double> > X, vector<int> Y, bool verbose, double alpha){
-
-	vector<double> W 	= NewtonsMethod(X,Y, verbose,alpha);
-
-	return W;
+	W 	= NewtonsMethod(nX,nY, verbose,alpha);
+	double f1 	= get_f1(W, X, Y);
+	final_f1 	= argFI;
+	return best_W;
 }

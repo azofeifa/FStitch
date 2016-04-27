@@ -3,55 +3,13 @@
 #include <omp.h>
 #include <map>
 #include "grabTrainingExamples.h"
-#include "interval_tree.h"
 #include "NewtonsMethod.h"
 #include "BaumWelch.h"
 #include "write.h"
 #include "validate.h"
 using namespace std;
-bool EXIT(string BedGraphFile, string TrainingFile, string outFile, string np, string mc, string lr, string ct){
-	bool BGF 	= isFile(BedGraphFile);
-	bool TOF 	= isFile(TrainingFile);
-	bool NP 	= isNum(np);
-	bool MC 	= isNum(mc);
-	bool LR 	= isNum(lr);
-	bool MS 	= isNum(ct);
-	if (not BGF){
-		cout<<"FILE (-i): "<<BedGraphFile<<", does not exist"<<endl;
-		return 1;
-	}
-	if (not TOF){
-		cout<<"Training File (-j): "<< TrainingFile<<", does not exist"<<endl;
-		return 1;
-	}
-	if (not NP){
-		cout<<"Number of Processors (-np): "<<np<<" is not an integer value"<<endl;
-		return 1;
-	}
-	if (not MC){
-		cout<<"Maximum number of learning iterations (-cm): "<<mc<<" is not a number"<<endl;
-		return 1;
-	}
-	if (not LR){
-		cout<<"Learning rate (-lr): "<<lr<<" is not a number"<<endl;
-		return 1;
-	}
-	if (not MS){
-		cout<<"Convergence threshold (-ct): "<<ct<<" is not a number"<<endl;
-		return 1;
-	}
-
-	return 0;
-
-}
 
 int run_main_train(paramsTrain PT){
-	bool exit_bool 								= EXIT(PT.params["-i"], PT.params["-j"], PT.params["-o"], PT.params["-np"],
-		PT.params["-cm"], PT.params["-lr"], PT.params["-ct"]);
-	if (exit_bool){
-		cout<<"exiting..."<<endl;
-		return 0;
-	}
 
 	//=================================================================
 	// General Parameters
@@ -71,79 +29,51 @@ int run_main_train(paramsTrain PT){
 	
 	//=================================================================
 
-	if (verbose){
-		cout<<"reading training file                     : ";
-	}
+	printf("reading in training file.............................");
+	cout.flush();
 	//=================================================================
 	//READ TRAINING FILE
-	readTrainingFileReturn TrainReturn 	= readTrainingFile(TrainingFile);
-	if (TrainReturn.EXIT){
-		cout<<"exiting..."<<endl;
+	vector<segment *> training_segments 	= load::load_intervals_of_interest(TrainingFile);
+	if (training_segments.empty()){
+		printf("Training Segments Not Populated, is (-j) in the correct format?\n");
+		printf("exiting....\n");
 		return 0;
 	}
-	map<string, interval *> TrainingIntervals 	= TrainReturn.result;
+	map<string, vector<segment *>> GG 		= load::convert_segment_vector(training_segments);
 
-	if (verbose){
-		cout<<"done"<<endl;
-		cout<<"making interval tree                      : ";
-	}
-	//=================================================================
-	//INTERVAL TREE FROM TRAINING FILE
-	map<string,T> R 							= makeIntervalTree(TrainingIntervals);
-	if (verbose){
-		cout<<"done"<<endl;
-		cout<<"reading bed graph file                    : ";
-		cout<<flush;
-	}
-	//=================================================================
-	//READ BEDGRAPH FILE
-	map<string,contig *> ContigData 			= readBedGraphFile(BedGraphFile,TrainingIntervals,1);
-	if (ContigData.empty()){
-		cout<<"exiting..."<<endl;
-		return 0;
-	}
-	if (verbose){
-		cout<<"done\n";
-		cout<<"grabbing training data from bedgraph file : ";
-		cout<<flush;
+	printf("done\n");
+	printf("inserting bedgraph data to training file intervals...");
+	cout.flush();
+	vector<segment*> integrated_segments 	= load::insert_bedgraph_to_segment_joint(GG, 
+			BedGraphFile);
+	printf("done\n");
+	printf("transforming data to contig information..............");
+	cout.flush();
+	run_out RO 								= load::convert_to_run_out(integrated_segments);
+	printf("done\n");
 	
-	}
-	//=================================================================
-	//GET DATA FROM TRAINING INTERVALS 
-	run_out RO  								= run_grabTrainingExamples(R, ContigData, ChIP);
-	if (RO.EXIT or RO.X.empty() or RO.Y.empty()){
-		cout<<"exiting..."<<endl;
-		cout<<"No training data was found in the provided intervals"<<endl;
-		return 0;
-	}
-	if (verbose){
-		cout<<"done\n";
-		cout<<"Begin parameter estimation, Newtons Method: ";
-		cout<<flush;
+
 	
-	}
 	//=================================================================
 	//NEWTONS METHOD  
-	vector<double> W 							= learn(RO.X, RO.Y, 0, learning_rate);
-	if (verbose){
-		cout<<"done\n";
-		cout<<"Parameter estimation, Baum-Welch          : ";
-		cout<<flush;
-	}
-	//=================================================================
-	//BAUM WELCH ALG 
-	BW_OUT BWO 									= runBW(ContigData, W,max_convergence, convergence_threshold,learning_rate, verbose, num_proc, maxSeed, ChIP);
-	if (verbose){
-		cout<<"done\n";
-		cout<<"Writing learned parameters                : ";
-		cout<<flush;
-	
-	}
-	writeTrainingFile(outFile, BWO, learning_rate, max_convergence, convergence_threshold, ChIP);
-	if (verbose){
-		cout<<"done\n";
-	}
+	double average_f1 	= 0;
+	printf("running Newton's Method for Logistic Regression......");
+	cout.flush();
+	vector<double> W 							= learn(RO.X, RO.Y, 0, learning_rate,average_f1);
+	printf("done\n");
 
+	//=================================================================
+	//Markov Optimization  
+	vector<vector<double>> A 					= learn_transition_parameters(W , RO.X,  RO.Y);
+	printf("Learned Parameters               : %f,%f,%f\n",W[0],W[1],W[2] );
+	printf("Average F1 precision             : %f\n", average_f1);
+	printf("Markov Chain Transition Matrix   : {%f, %f} {%f, %f}\n",A[0][0],A[0][1],A[1][0],A[1][1]);
+	printf("writing out parameters...............................");
+	cout.flush();
+	
+	writeTrainingFile(outFile, W,   A, learning_rate,  max_convergence,  convergence_threshold);
+	printf("done\n");
+	return 1;
 	
 	
 }	

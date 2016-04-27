@@ -13,11 +13,11 @@ CPP_FLAGS_32  	= -D32_BIT
 CPP_FLAGS_64  	= -D64_BIT
 
 GCCVERSION 		= $(shell gcc --version | grep ^gcc | sed 's/^.* //g')
-FStitch: main.o BaumWelch.o NewtonsMethod.o read_in_parameters.o read.o main_train.o grabTrainingExamples.o interval_tree.o \
+FStitch: main.o BaumWelch.o NewtonsMethod.o read_in_parameters.o read.o main_train.o grabTrainingExamples.o \
 		 split.o write.o main_segment.o viterbi.o validate.o
 	@${CXX} ${CXXFLAGS} ${PWD}/main.o  ${PWD}/BaumWelch.o \
 		${PWD}/NewtonsMethod.o ${PWD}/read_in_parameters.o ${PWD}/read.o \
-		${PWD}/interval_tree.o ${PWD}/grabTrainingExamples.o ${PWD}/main_train.o \
+		 ${PWD}/grabTrainingExamples.o ${PWD}/main_train.o \
 		${PWD}/split.o ${PWD}/write.o ${PWD}/main_segment.o ${PWD}/viterbi.o ${PWD}/validate.o  -o ${EXEC}
 	@echo "========================================="
 	@echo Sucessfully Compiled
@@ -42,9 +42,6 @@ split.o:
 grabTrainingExamples.o: 
 		@${CXX} -c ${CXXFLAGS} ${PWD}/grabTrainingExamples.cpp 
 		@echo Compiled grabTrainingExamples
-interval_tree.o: 
-		@${CXX} -c ${CXXFLAGS} ${PWD}/interval_tree.cpp 
-		@echo Compiled interval_tree
 NewtonsMethod.o:
 		@${CXX} -c ${CXXFLAGS} ${PWD}/NewtonsMethod.cpp 
 		@echo Compiled NewtonsMethod

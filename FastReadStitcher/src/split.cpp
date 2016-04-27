@@ -33,6 +33,68 @@ vector<string> splitter2(string line, string delim){
 	return tokens;
 }
 
+
+
+vector<string> split_by_bar(string line, string delim){
+	vector<string> tokens;
+	istringstream iss(line);
+	string token;
+	while(std::getline(iss, token, '|' )){   // but we can specify a different one
+		tokens.push_back(token);
+	}
+	return tokens;
+}
+vector<string> split_by_colon(string line, string delim){
+	vector<string> tokens;
+	istringstream iss(line);
+	string token;
+	while(std::getline(iss, token, ':' )){   // but we can specify a different one
+		tokens.push_back(token);
+	}
+	return tokens;
+}
+vector<string> split_by_tab(string line, string delim){
+	vector<string> tokens;
+	istringstream iss(line);
+	string token;
+	while(std::getline(iss, token, '\t' )){   // but we can specify a different one
+		tokens.push_back(token);
+	}
+	return tokens;
+}
+vector<string> split_by_comma(string line, string delim){
+	vector<string> tokens;
+	istringstream iss(line);
+	string token;
+	while(std::getline(iss, token, ',' )){   // but we can specify a different one
+		tokens.push_back(token);
+	}
+	return tokens;
+}
+vector<string> split_by_dash(string line, string delim){
+	vector<string> tokens;
+	istringstream iss(line);
+	string token;
+	while(std::getline(iss, token, '-' )){   // but we can specify a different one
+		tokens.push_back(token);
+	}
+	return tokens;
+}
+
+
+string strip(string ELE, string D){
+	const char *d 	= D.c_str();
+	string result 	= "";
+	for (int i = 0; i < ELE.size(); i++){
+		if (ELE[i]==*d){
+			break;
+		}else{
+			result+=ELE[i];
+		}
+	}
+	return result;
+}
+
 string join(vector<string> toBeJoined, string delim){
 	typedef vector<string>::iterator vs_it;
 	string result="";
