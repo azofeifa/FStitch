@@ -58,6 +58,16 @@ We note that specifying five prime (-5) in the “genomecov” may allow for cle
 ##Running FStitch
 The Fast Read Stitcher program is divided into two main commands: “train” and “segment”. “train” estimates the necessary probabilistic model parameters and “segment” pulls the output from “train” and classifies the entire genome into _active_ and _inactive_ regions of regions of high density read coverage. 
 
+Note that a quick reference to the below parameters and software usage can be supplied by 
+
+$/src/FStitch -h
+
+or 
+
+$/src/FStitch --help
+
+
+
 ##FStitch train
 FStitch uses two probabilistic models to classify regions of high read density that may be indicative of nascent transcription (GRO-seq) or a read coverage peak (ChIP-seq): Logistic Regression and a Hidden Markov Model. The logistic regression coefficients are estimated via a user defined label training file.  Sense we are classifying regions as signal or noise, FStitch requires regions of the genome that show characteristic transcription or high read dense profiles and regions of the genome that display noise or not a profile of nascent transcription or a read dense region. With this information, FStitch trains a logistic regression classifier and then couples it to a hidden markov model. The transition parameters for the HMM are learned via the Baum Welch algorithm and thus do not require user label training data.  
 
@@ -76,8 +86,6 @@ Running FStitch train is simple once you have your data in the correct format an
 5. -al	= number “learning rate for newtons method, default 1”
 6. -cm	= number “max number of iterations for Baum-Welch, default 100”
 7. -ct	= number “convergence threshold for Baum Welch, default 0.01”
-8. -v 	= no value “verbose output, recommended for first time users”
-9. -ChIP= no value "feature selection optimized for ChIP datasets"
 Putting this together
 
 $/src/FStitch train -i \</path/to/BedGraphFile\> -j \</path/to/TrainingFile> -o \</path/to/anyName.out>
@@ -92,13 +100,12 @@ Very important: If FStitch is being used on stranded data, the BedGraph file use
 ##FStitch segment
 FStitch segment follows from FStitch train and takes as input the TrainingParameterOutFile (from above, \</path/to/anyName.out>) as input, along with the originally BedGraph file. A description of the parameters for FStitch segment are given below
 
-1. -i	= \</path/to/BedGraphFile> “BedGraph File from above”
-2. -j 	= \</path/to/anyName.out> “Training Parameter Out File from FStitch train call”
-3. -o	= \</path/to/anyName.bed> “A bed file that gives the regions considered active nascent transcription (or ChIP-seq peak) and noise”
-4. -r 	= \</path/to/UCSC_Table_Gene_Annotations> “UCSC gene annotation table<sup>2</sup>”
-4. -np 	= number “number of processors, default 8”
-5. -v	= no value, “if specified, verbose output, recommended for first time users”
-6. -s	= “forward/pos” or “reverse/neg”
+1. -i	= \</path/to/BedGraphFileForwardStrand> “BedGraph File Format from above”
+2. -j = \</path/to/BedGraphFileReverseStrand> “BedGraph File Format from above”
+3. -ij =\</path/to/BedGraphFileForwardAndReverseStrand> “BedGraph File Format from above except that coverage values < 0 are interpreted as arising from the reverse strand >0 arising from the forward strand”
+4. -k 	= \</path/to/anyName.out> “Training Parameter Out File from FStitch train call”
+5. -o	= \</path/to/anyName.bed> “A bed file that gives the regions considered active nascent transcription (or ChIP-seq peak) and noise”
+6. -np 	= number “number of processors, default 8”
 
 Putting this together
 $/src/FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/anyName.out> -o \</path/to/anyName.bed> -s +
