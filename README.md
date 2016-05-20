@@ -10,7 +10,7 @@ Here are the minimal commands needed to run FStitch from start to finish; for gr
 
 $FStitch train -i \</path/to/BedGraphFile\> -j \</path/to/TrainingFile> <sup>__*__</sup>  -o \</path/to/Parameters.out>
 
-$FStitch segment -i \</path/to/forward/BedGraphFile\> -j \</path/to/reverse/BedGraphFile\> -k \</path/to/Parameters.out> -o \</path/to/Classifications.bed> <sup>__**__</sup> -s +\- <sup>__***__</sup>
+$FStitch segment -i \</path/to/forward/BedGraphFile\> -j \</path/to/reverse/BedGraphFile\> -k \</path/to/Parameters.out> -o \</path/to/Classifications.bed>
 
 <sup>__*__</sup>TrainingFile is created by the user, see below for details
 
