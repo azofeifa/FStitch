@@ -71,6 +71,7 @@ In short, FStitch requires regions the user considers active transcription (or a
 The segments do not need to be in any order and can be from any chromosome, however each region must not overlap any other segment as this will cause confusion in the learning algorithms for the logistic regression classifier. 
 
 Running FStitch train is simple once you have your data in the correct format and have created the training file above. A description of the parameters for FStitch train are given below
+
 |Flag|Type|Desription|
 |----|----|----------|
 |-i	 | \</path/to/BedGraphFile> “BedGraph File from above”
