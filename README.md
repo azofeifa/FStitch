@@ -4,20 +4,15 @@ Below is the README for compiling, running and understanding Fast Read Stitcher 
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/IGV_SNAP.png)
 
 
-The above IGV Snap shot displays the classifications given by FStitch. Color ‘green’ is read data considered inactive noise. Color ‘blue’ is a putative nascent transcript on the forward strand and ‘red’ on the reverse strand. We identify both genes undergoing nascent transcription and many regions that are unannotated, characteristic of enhancer elements. 
+Above: IGV snap shot displays the classifications given by FStitch. Color ‘green’ is read data considered inactive noise. Color ‘blue’ is a putative nascent transcript on the forward strand and ‘red’ on the reverse strand. We identify both genes undergoing nascent transcription and many regions that are unannotated, characteristic of enhancer elements. 
+
 ##Brief Overview of FStitch Commands
-Here are the minimal commands needed to run FStitch from start to finish; for greater detail see below.
+Here are the minimal commands needed to run FStitch from start to finish; for greater detail on usage and file types see below. 
 ```
 $ FStitch train -i </path/to/BedGraphFile> -j </path/to/TrainingFile>  -o </path/to/Parameters.out>
 
 $ FStitch segment -i </path/to/forward/BedGraphFile> -j </path/to/reverse/BedGraphFile> -k </path/to/Parameters.out> -o </path/to/Classifications.bed>
 ```
-<sup>__*__</sup>TrainingFile is created by the user, see below for details
-
-<sup>__**__</sup>Classifications.bed can be imported into any genome browser. 
-
-<sup>__***__</sup>When using stranded data like GRO-seq, FStitch runs on each strand separately, so created BedGraph files from bam files must be separated by strand accordingly, see below for details.
-
 
 ##System Requirements
 FStitch is written in the C++ programming language, with C++11 support and uses OpenMP<sup>4</sup> to parallelize portions of the program.  With this in mind, users will need to have a GCC compilers later than version 4.7 to compile and run FStitch. For mac users, downloading the latest Xcode will update the GCC compiler need be. To check you compiler version, 
@@ -33,18 +28,15 @@ $ sh setup.sh
 =========================================
 Sucessfully Compiled
 ```
-This runs “make” in the src/ directory. If everything compiles, you should see at the end of the compilation:
-
-
+In short, the setup.sh just runs “make” in the src/ directory. If everything compiles, you should see "Sucessfully Compiled" at the end.
 
 Importantly, you will now see the executable “FStitch” in the src directory. This will be the first command used for all the following computations. 
 ##Input File
-The fast read stitcher program attempts to classify and identify contiguous regions of read coverage that are showing strong signal over background mapping noise. With this in mind, FStitch requires a BedGraph file. Where for each genomic position, the number of reads mapping to that position are provided. This commonly known as a BedGraph file<sup>2</sup>. Briefly a BedGraph file consists of four columns: chromosome, start genomic coordinate, stop genomic coordinate, coverage. Below is an example:
-
+The fast read stitcher program attempts to classify and identify contiguous regions of read coverage that are showing strong signal over background mapping noise. With this in mind, FStitch requires a file where for each genomic position, the number of reads mapping to that position are provided. This file is commonly known as a BedGraph file<sup>2</sup>. Briefly a BedGraph file consists of four columns: chromosome, start genomic coordinate, stop genomic coordinate, coverage. Below is an example:
   
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/BedGraphScreenShot.png)
 
-Note: FStitch does not accept bed graph files where 0 coverage values are reported and if data is strand (like GRO-seq) then there should be one BedGraph file corresponding to the positive strand (forward) and the negative strand (reverse). In short, you can convert your bam files to a bed graph file format using the _bedtools_<sup>3</sup> command:
+Note: FStitch does not accept bedgraph files where 0 coverage values are reported and if the data is stranded (like GRO-seq) then there should be one BedGraph file corresponding to the positive strand (forward) and the negative strand (reverse). In short, you can convert your bam files to a bed graph file format using the _bedtools_<sup>3</sup> command:
 ```
 $ bedtools genomecov -ibam <bamfile> -g <genome_file> -bg -s “+/-“
 ```
@@ -62,9 +54,9 @@ $/src/FStitch --help
 
 
 ##FStitch train
-FStitch uses two probabilistic models to classify regions of high read density that may be indicative of nascent transcription (GRO-seq) or a read coverage peak (ChIP-seq): Logistic Regression and a Hidden Markov Model. The logistic regression coefficients are estimated via a user defined label training file.  Sense we are classifying regions as signal or noise, FStitch requires regions of the genome that show characteristic transcription or high read dense profiles and regions of the genome that display noise or not a profile of nascent transcription or a read dense region. With this information, FStitch trains a logistic regression classifier and then couples it to a hidden markov model. The transition parameters for the HMM are learned via the Baum Welch algorithm and thus do not require user label training data.  
+FStitch uses two probabilistic models to classify regions of high read density that may be indicative of nascent transcription (GRO-seq) or a read coverage peak (ChIP-seq): Logistic Regression and a Hidden Markov Model. The logistic regression coefficients are estimated via a user defined label training file.  Sense we are classifying regions as signal or noise, FStitch requires regions of the genome that show characteristic transcription or high read dense profiles and regions of the genome that display noise or not a profile of nascent transcription or a read dense region. With this information, FStitch trains a logistic regression classifier and then couples it to a Markov model. The transition parameters for the Markov model are learned via the Baum Welch algorithm and thus do not require user label training data.  
 
-In short, FStitch requires regions the user considers active transcription (or a peak) and regions considered inactive (simply noise). We note that the more regions provided to FStitch the more accurate the classifications however we have in Cross Validation<sup>1</sup> analysis that roughly 5-10 regions of active and inactive regions will yield highly accurate classifications. These regions are provided to FStitch using a specific file format with four columns separated by tabs: chromosome, genomic coordinate start, genomic coordinate stop, (0 if “noise” or 1 “signal”). An example is given below:
+In short, FStitch requires regions the user considers active transcription (or a peak) and regions considered inactive (simply noise). We note that the more regions provided to FStitch the more accurate the classifications however we have in Cross Validation<sup>1</sup> analysis that roughly 10-15 regions of active and inactive regions will yield accurate classifications. These regions are provided to FStitch using a specific file format with four columns separated by tabs: chromosome, genomic coordinate start, genomic coordinate stop, (0 if “noise” or 1 “signal”). An example is given below:
 
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/TrainingFileImage2.png)
 
@@ -94,7 +86,7 @@ Very important: If FStitch is being used on stranded data, the BedGraph file use
 
 
 ##FStitch segment
-FStitch segment follows from FStitch train and takes as input the TrainingParameterOutFile (from above, \</path/to/anyName.out>) as input, along with the originally BedGraph file. A description of the parameters for FStitch segment are given below
+FStitch segment follows from FStitch train and takes as input the TrainingParameterOutFile (from above, \</path/to/anyName.out>) as input, along with the original BedGraph file. A description of the parameters for FStitch segment are given below
 
 |Flag|Type|Desription|
 |----|----|----------|
