@@ -7,11 +7,11 @@ Below is the README for compiling, running and understanding Fast Read Stitcher 
 The above IGV Snap shot displays the classifications given by FStitch. Color ‘green’ is read data considered inactive noise. Color ‘blue’ is a putative nascent transcript on the forward strand and ‘red’ on the reverse strand. We identify both genes undergoing nascent transcription and many regions that are unannotated, characteristic of enhancer elements. 
 ##Brief Overview of FStitch Commands
 Here are the minimal commands needed to run FStitch from start to finish; for greater detail see below.
+```
+$ FStitch train -i </path/to/BedGraphFile> -j </path/to/TrainingFile>  -o </path/to/Parameters.out>
 
-$FStitch train -i \</path/to/BedGraphFile\> -j \</path/to/TrainingFile> <sup>__*__</sup>  -o \</path/to/Parameters.out>
-
-$FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/Parameters.out> -o \</path/to/Classifications.bed> <sup>__**__</sup> -s +\- <sup>__***__</sup>
-
+$ FStitch segment -i </path/to/forward/BedGraphFile> -j </path/to/reverse/BedGraphFile> -k </path/to/Parameters.out> -o </path/to/Classifications.bed>
+```
 <sup>__*__</sup>TrainingFile is created by the user, see below for details
 
 <sup>__**__</sup>Classifications.bed can be imported into any genome browser. 
@@ -21,24 +21,19 @@ $FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/Parameters.out> -o \
 
 ##System Requirements
 FStitch is written in the C++ programming language, with C++11 support and uses OpenMP<sup>4</sup> to parallelize portions of the program.  With this in mind, users will need to have a GCC compilers later than version 4.7 to compile and run FStitch. For mac users, downloading the latest Xcode will update the GCC compiler need be. To check you compiler version, 
-
-$gcc —-version
-
-or 
-
-$g++ —-version
-
+```
+$ gcc —-version
+$ g++ —-version
+```
 Note, for those running FStitch on a compute cluster, commonly you will need to perform a ‘module load gcc<version>’ to compile FStitch. Please ask your sys admins for questions on module load behavior. 
 ##Setup
 Download the FastReadStitcher/ directory from this url or clone to your local machine. If your compiler is up to date, you can compile FStitch by moving into the FastReadStitcher/ directory and running 
-
-$sh setup.sh
-
+```
+$ sh setup.sh
+=========================================
+Sucessfully Compiled
+```
 This runs “make” in the src/ directory. If everything compiles, you should see at the end of the compilation:
-
-$=========================================
-
-$Sucessfully Compiled
 
 
 
@@ -50,22 +45,20 @@ The fast read stitcher program attempts to classify and identify contiguous regi
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/BedGraphScreenShot.png)
 
 Note: FStitch does not accept bed graph files where 0 coverage values are reported and if data is strand (like GRO-seq) then there should be one BedGraph file corresponding to the positive strand (forward) and the negative strand (reverse). In short, you can convert your bam files to a bed graph file format using the _bedtools_<sup>3</sup> command:
-
-$bedtools genomecov -ibam <bamfile> -g <genome_file> -bg -s “+/-“
-
+```
+$ bedtools genomecov -ibam <bamfile> -g <genome_file> -bg -s “+/-“
+```
 We note that specifying five prime (-5) in the “genomecov” may allow for cleaner annotations however unspecified five prime bed works just fine as well. 
 
 ##Running FStitch
 The Fast Read Stitcher program is divided into two main commands: “train” and “segment”. “train” estimates the necessary probabilistic model parameters and “segment” pulls the output from “train” and classifies the entire genome into _active_ and _inactive_ regions of regions of high density read coverage. 
 
 Note that a quick reference to the below parameters and software usage can be supplied by 
-
-$/src/FStitch -h
-
-or 
+```
+$/src/FStitch -h 
 
 $/src/FStitch --help
-
+```
 
 
 ##FStitch train
@@ -79,17 +72,20 @@ The segments do not need to be in any order and can be from any chromosome, howe
 
 Running FStitch train is simple once you have your data in the correct format and have created the training file above. A description of the parameters for FStitch train are given below
 
-1. -i	= \</path/to/BedGraphFile> “BedGraph File from above”
-2. -j	= \</path/to/TrainingFile> “Training File from above”
-3. -o	= \</path/to/anyName> “TrainingParameterOutFile”
-4. -np	= number “number of processors, default 8”
-5. -al	= number “learning rate for newtons method, default 1”
-6. -cm	= number “max number of iterations for Baum-Welch, default 100”
-7. -ct	= number “convergence threshold for Baum Welch, default 0.01”
+|Flag|Type|Desription|
+|----|----|----------|
+|-i	 | \</path/to/BedGraphFile> | BedGraph File from above
+| -j | \</path/to/TrainingFile> | Training File from above
+| -o | \</path/to/anyName> | TrainingParameterOutFile
+| -np| number | number of processors, default 8
+| -al| number |learning rate for newtons method, default 1
+| -cm| number | max number of iterations for Baum-Welch, default 100
+| -ct| number | convergence threshold for Baum Welch, default 0.01
+
 Putting this together
-
-$/src/FStitch train -i \</path/to/BedGraphFile\> -j \</path/to/TrainingFile> -o \</path/to/anyName.out>
-
+```
+$ /src/FStitch train -i \</path/to/BedGraphFile\> -j \</path/to/TrainingFile> -o \</path/to/anyName.out>
+```
 This will produce the a fie called anyName.out that will store the learned parameters for the logistic regression and HMM transition parameters need in “FStitch segment”. Below is one such output for anyName.out
 
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/ParameterOutFile.png)
@@ -100,16 +96,19 @@ Very important: If FStitch is being used on stranded data, the BedGraph file use
 ##FStitch segment
 FStitch segment follows from FStitch train and takes as input the TrainingParameterOutFile (from above, \</path/to/anyName.out>) as input, along with the originally BedGraph file. A description of the parameters for FStitch segment are given below
 
-1. -i	= \</path/to/BedGraphFileForwardStrand> “BedGraph File Format from above”
-2. -j = \</path/to/BedGraphFileReverseStrand> “BedGraph File Format from above”
-3. -ij =\</path/to/BedGraphFileForwardAndReverseStrand> “BedGraph File Format from above except that coverage values < 0 are interpreted as arising from the reverse strand >0 arising from the forward strand”
-4. -k 	= \</path/to/anyName.out> “Training Parameter Out File from FStitch train call”
-5. -o	= \</path/to/anyName.bed> “A bed file that gives the regions considered active nascent transcription (or ChIP-seq peak) and noise”
-6. -np 	= number “number of processors, default 8”
+|Flag|Type|Desription|
+|----|----|----------|
+| -i	| \</path/to/BedGraphFileForwardStrand> |BedGraph File Format from above
+| -j | \</path/to/BedGraphFileReverseStrand> |BedGraph File Format from above
+| -ij |\</path/to/BedGraphFileForwardAndReverseStrand> |BedGraph File Format from above except that coverage values < 0 are interpreted as arising from the reverse strand >0 arising from the forward strand
+| -k 	| \</path/to/anyName.out> |Training Parameter Out File from FStitch train call
+| -o	| \</path/to/anyName.bed> |A bed file that gives the regions considered active nascent transcription (or ChIP-seq peak) and noise
+| -np 	| number |number of processors, default 8
 
 Putting this together
-$/src/FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/anyName.out> -o \</path/to/anyName.bed> -s +
-
+```
+$ /src/FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/anyName.out> -o \</path/to/anyName.bed> -s +
+```
 This will produce a file called anyName.bed, and can be imported into any genome browser, an example of the track output is given above in the “Usage and Output” section, here is what the text file looks like:
 
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/ClassificationsIGV.png)
