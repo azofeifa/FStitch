@@ -45,6 +45,9 @@ vector<int> runViterbi(vector<vector<double>> X, vector<double> W, vector<vector
 	A[0] 	= new double[2], A[1] 	= new double[2];
 	A[0][0] = a[0][0],A[1][0] = a[1][0],A[0][1] = a[0][1],A[1][1] = a[1][1];
 	vector<int> results;
+	if (not X.size()){
+	  return results;
+	}
 	
 	int T  				= X.size();
 	//====================================================================
@@ -157,14 +160,20 @@ map<string, map<string, vector<segment *> >> run_viteribi_across(map<string, seg
 		vector<vector<double>> st_spf,st_spr;
 		vector<vector<double>> Xf 	= (c->second)->get_contig_info(1,st_spf) ;
 		vector<vector<double>> Xr  	= (c->second)->get_contig_info(-1,st_spr);
-
 		vector<int> resultsf = runViterbi( Xf,   W, A );
 		vector<int> resultsr = runViterbi( Xr,   W, A );
-		vector<vector<int>> comb 	= {resultsf,resultsr};
+		vector<vector<int>> comb;
+		if ((resultsf.size() > 0) and (resultsr.size()>0)){
+		  comb = {resultsf,resultsr};
+		}else if ((resultsf.size() > 0))  {
+		  comb = {resultsf};
+		}else if((resultsr.size() > 0) ){
+		  comb = {resultsr};
+		}
 		vector<vector<vector<double>>> comb_stsp 	= {st_spf,st_spr};
 		string strand = "";
 		double start=0, stop=0;
-		for (int i = 0 ; i < 2; i++){
+		for (int i = 0 ; i < comb.size(); i++){
 			if (i==0){
 				strand 	 = "+";
 			}else{

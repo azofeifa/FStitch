@@ -22,28 +22,6 @@ int run_main_segment(paramsSegment  PT){
 	string refFile 				= PT.params["-r"];
 	string strand 				= PT.params["-s"];
 	string np 					= PT.params["-np"];
-	// bool exit_bool 				= EXIT(BedGraphFile, TrainingOutFile, outFile, refFile, strand, np);
-	// if (exit_bool){
-	// 	cout<<"exiting..."<<endl;
-	// 	return 0;
-	// }
-	// int num_proc 				= stoi(np);
-	// if (strand.empty()){
-	// 	if (isPos(BedGraphFile)){
-
-	// 		strand = "+";
-	// 	}else if(isNeg(BedGraphFile)){
-	// 		strand = "-";
-	// 	}else{
-	// 		strand = ".";
-	// 	}
-	// }
-	// bool verbose 				= not PT.params["-v"].empty();
-	// //=================================================================
-	// //Read in FStich Training out file
-	// if (verbose){
-	// 	cout<<"Reading in FStitch Training Out File: ";
-	// }
 	printf("loading training/parameter out file................");
 	cout.flush();
 	RTOF RTOF_params 					= readTrainingOutFile(TrainingOutFile);	

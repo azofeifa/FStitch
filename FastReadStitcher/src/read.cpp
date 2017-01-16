@@ -572,7 +572,12 @@ map<string, segment*> load::load_bedgraphs_total(string forward_strand,
 		FILES 	= {joint_bedgraph};
 	}else if (not forward_strand.empty() and not reverse_strand.empty()){
 		FILES 	= {forward_strand, reverse_strand};
-	}else{
+	}else if( not forward_strand.empty() ){
+	  FILES   = {forward_strand};
+	}else if(not reverse_strand.empty()){
+	  FILES   = {reverse_strand};
+	} 
+	else{
 		return G;
 	}
 	
@@ -612,9 +617,7 @@ map<string, segment*> load::load_bedgraphs_total(string forward_strand,
 			if (INSERT){
 				vector<double> x(4);
 				double center 	= (stop + start) /2.;
-
 				x[0]=center, x[1]=start, x[2]=stop, x[3] = abs(coverage);
-
 				if (u==0){
 					if (coverage > 0){
 						G[chrom]->add2(1, x);
