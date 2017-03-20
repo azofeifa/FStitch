@@ -16,7 +16,7 @@ int run_main_train(paramsTrain PT){
 
 	string BedGraphFile 						= PT.params["-i"];
 	string TrainingFile 						= PT.params["-j"];
-	string outFile 								= PT.params["-o"];
+	string outFile 							= PT.params["-o"];
 	int num_proc 								= stoi(PT.params["-np"]);
 	bool verbose 								= not PT.params["-v"].empty();
 	bool ChIP 									= not PT.params["-chip"].empty();
@@ -25,7 +25,7 @@ int run_main_train(paramsTrain PT){
 	double max_convergence 						= stof(PT.params["-cm"]);
 	double convergence_threshold 				= stof(PT.params["-ct"]);
 	double learning_rate 						= stof(PT.params["-al"]);
-	int maxSeed 								= stoi(PT.params["-ms"]);
+	int maxSeed 									= stoi(PT.params["-ms"]);
 	
 	//=================================================================
 

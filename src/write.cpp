@@ -65,14 +65,10 @@ void writeViterbiPaths(string OUT, map<string, map<string, vector<segment *> >> 
 
 	typedef map<string, map<string, vector<segment *> >>::iterator it_type;
 	typedef   map<string, vector<segment *> >::iterator it_type_2;
+	int ct=0;
 	for (it_type s = S.begin(); s!=S.end(); s++){
 		ofstream FHW;
-		if (s->first == "+"){
-			FHW.open(OUT+ ".forward.bed");
-		}else{
-			FHW.open(OUT+ ".reverse.bed");	
-		}
-	
+		FHW.open(OUT);
 		FHW<<"track name=FStitch_Annotations " <<getDtTm(buff) << "visibility=1 useScore=2 cgGrades=50 cgColour1=white cgColour2=yellow cgColour3=red height=30\n";	
 		for (it_type_2 c= s->second.begin(); c!=s->second.end(); c++){
 			for (int i = 0 ; i < c->second.size(); i++){
@@ -80,23 +76,9 @@ void writeViterbiPaths(string OUT, map<string, map<string, vector<segment *> >> 
 				int stop 	= c->second[i]->stop;
 				string state 	= "";
 				if (c->second[i]->ID == 1){
-					score 	= "100";
-					state 	= "ON";
-					if (s->first=="+"){
-						RGB 	= "0,0,255";
-					}else{
-						RGB 	= "255,0,0";
-					}
-				}else{
-					state 		= "OFF";
-					RGB 		= "0,255,0";	
-					score 		= "500";
-					
+					FHW<<c->first<<"\t"<<to_string(start)<<"\t"<<to_string(stop)<<"\tFStitch_"+ to_string(ct)+"\t" + to_string(c->second[i]->score)+ "\n";			
+					ct+=1;
 				}
-
-				FHW<<c->first<<"\t"<<to_string(start)<<"\t"<<to_string(stop)<<"\t"<<state;
-				FHW<<"\t"<<score<<"\t"<<s->first<<"\t"<<to_string(start)<<"\t"<<to_string(stop)<<"\t"<<RGB<<endl;
-					
 			}
 		}
 	}

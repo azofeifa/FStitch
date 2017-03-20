@@ -36,7 +36,7 @@ The fast read stitcher program attempts to classify and identify contiguous regi
   
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/BedGraphScreenShot.png)
 
-Note: FStitch does not accept bedgraph files where 0 coverage values are reported and if the data is stranded (like GRO-seq) then there should be one BedGraph file corresponding to the positive strand (forward) and the negative strand (reverse). In short, you can convert your bam files to a bed graph file format using the _bedtools_<sup>3</sup> command:
+Note: FStitch does not accept bedgraph files where 0 coverage values are reported and if the data is stranded (like GRO-seq) then there should be one BedGraph file corresponding to the positive strand and the negative strand . In short, you can convert your bam files to a bed graph file format using the _bedtools_<sup>3</sup> command:
 ```
 $ bedtools genomecov -ibam <bamfile> -g <genome_file> -bg -s “+/-“
 ```
@@ -90,20 +90,18 @@ FStitch segment follows from FStitch train and takes as input the TrainingParame
 
 |Flag|Type|Desription|
 |----|----|----------|
-| -i	| \</path/to/BedGraphFileForwardStrand> |BedGraph File Format from above
-| -j | \</path/to/BedGraphFileReverseStrand> |BedGraph File Format from above
-| -ij |\</path/to/BedGraphFileForwardAndReverseStrand> |BedGraph File Format from above except that coverage values < 0 are interpreted as arising from the reverse strand >0 arising from the forward strand
+| -i	| \</path/to/BedGraphFile> |BedGraph File Format from above
 | -k 	| \</path/to/anyName.out> |Training Parameter Out File from FStitch train call
 | -o	| \</path/to/anyName.bed> |A bed file that gives the regions considered active nascent transcription (or ChIP-seq peak) and noise
 | -np 	| number |number of processors, default 8
 
 Putting this together
 ```
-$ /src/FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/anyName.out> -o \</path/to/anyName.bed> -s +
+$ /src/FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/anyName.out> -o \</path/to/anyName.bed> 
 ```
-This will produce a file called anyName.bed, and can be imported into any genome browser, an example of the track output is given above in the “Usage and Output” section, here is what the text file looks like:
+This will produce a file called anyName.bed, and can be imported into any genome browser)
 
-![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/ClassificationsIGV.png)
+Note you can use your parameter out file from FStitch train (i.e. anyName.out) to segment other datasets. In fact, using the same parameter out file will gurantee consistency and comparibility across datasets, so this is encouraged.
 
 ## Cite
 If you find the Fast Read Stitcher program useful for your research please cite:

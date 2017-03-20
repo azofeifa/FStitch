@@ -36,8 +36,6 @@ int main(int argc, char* argv[]) {
 	}else if (P->eRNA){
 		cout<<"need to finish segment code"<<endl;
 	}
-
-
 	delete P;
 	return 1;
 }

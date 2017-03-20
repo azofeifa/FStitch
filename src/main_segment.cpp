@@ -12,15 +12,10 @@ using namespace std;
 int run_main_segment(paramsSegment  PT){
 	// =================================================================
 	// General Parameters
-	string BedGraphFile_forward 		= PT.params["-i"];
-	string BedGraphFile_reverse 		= PT.params["-j"];
-	string BedGraphFile_joint 			= PT.params["-ij"];
-
-	
+	string BedGraphFile 			= PT.params["-i"];
 	string TrainingOutFile 		= PT.params["-k"];
 	string outFile 				= PT.params["-o"];
 	string refFile 				= PT.params["-r"];
-	string strand 				= PT.params["-s"];
 	string np 					= PT.params["-np"];
 	printf("loading training/parameter out file................");
 	cout.flush();
@@ -28,8 +23,7 @@ int run_main_segment(paramsSegment  PT){
 	printf("done\n");
 	printf("loading bedgraph file(s)...........................");
 	cout.flush();
-	map<string, segment*> 			G 	= load::load_bedgraphs_total(BedGraphFile_forward, 
-													BedGraphFile_reverse, BedGraphFile_joint);
+	map<string, segment*> 			G 	= load::load_bedgraphs_total(BedGraphFile);
 	printf("done\n");
 	if (G.empty()){
 		printf("Bedgraph file(s) were not loaded...\n");

@@ -48,7 +48,7 @@ class segment{
 public:
 	string chrom; 
 	int start, stop, ID, chrom_ID;
-	double minX, maxX;
+	double minX, maxX,score;
 	vector< vector<double> > forward;
 	vector< vector<double> > reverse;
 	string strand ;
@@ -59,6 +59,7 @@ public:
 	segment(string, int , int);
 	segment(string, int , int, int);
 	segment(string, int , int, int,string);
+	segment(string, int , int, int,string,double);
 
 	segment();
 	string write_out();
@@ -109,8 +110,7 @@ public:
 
 
 namespace load{
-	map<string, segment*> load_bedgraphs_total(string, 
-		string, string);
+	map<string, segment*> load_bedgraphs_total(string);
 	vector<segment *> load_intervals_of_interest(string);
 	vector<segment* > insert_bedgraph_to_segment_joint(map<string, vector<segment *> >  , 
 		 string );

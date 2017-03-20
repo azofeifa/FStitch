@@ -289,6 +289,22 @@ segment::segment(string chr, int st, int sp, int i, string STR){
 	chrom_ID= 0;
 
 }
+segment::segment(string chr, int st, int sp, int i, string STR, double SCORE){
+	chrom	= chr;
+	start	= st;
+	stop	= sp;
+	N 		= 0;
+	fN 		= 0;
+	rN 		= 0;
+	minX=st, maxX=sp;
+	counts 	= 0;
+	XN 		= 0;
+	ID 		= i;
+	strand 	= STR;
+	chrom_ID= 0;
+	score 	= SCORE;
+
+}
 
 segment::segment(){
 	N 		= 0;
@@ -560,27 +576,9 @@ void node::retrieve_nodes(vector<segment*> & saves){
 
 //================================================================================================
 //LOADING from file functions...need to clean this up...
-
-
-map<string, segment*> load::load_bedgraphs_total(string forward_strand, 
-	string reverse_strand, string joint_bedgraph){
-
+map<string, segment*> load::load_bedgraphs_total(string bedgraph){
 	map<string, segment*> 	G;
 	vector<segment*> segments;
-	vector<string> FILES;
-	if (forward_strand.empty() and reverse_strand.empty()){
-		FILES 	= {joint_bedgraph};
-	}else if (not forward_strand.empty() and not reverse_strand.empty()){
-		FILES 	= {forward_strand, reverse_strand};
-	}else if( not forward_strand.empty() ){
-	  FILES   = {forward_strand};
-	}else if(not reverse_strand.empty()){
-	  FILES   = {reverse_strand};
-	} 
-	else{
-		return G;
-	}
-	
 	string line, chrom;
 	int start, stop;
 	double coverage;
@@ -590,49 +588,36 @@ map<string, segment*> load::load_bedgraphs_total(string forward_strand,
 	bool INSERT 	= false;
 	bool EXIT 		= false;
 	int line_number = 0;
-	for (int u = 0 ; u < FILES.size(); u++){
-		ifstream FH(FILES[u]) ;
-		if (not FH ){
-			printf("couln't open FILE %s\n", FILES[u].c_str());
-		}
-		if (EXIT){
+	ifstream FH(bedgraph) ;
+	if (not FH ){
+		printf("couln't open FILE %s\n", bedgraph.c_str());
+		return G;
+	}
+	while (getline(FH, line)){
+		lineArray=splitter(line, "\t");
+		if (lineArray.size()!=4){
+			EXIT 	= true;
+			printf("\nLine number %d  in file %s was not formatted properly\nPlease see manual\n",line_number, bedgraph.c_str() );
 			break;
 		}
-		while (getline(FH, line)){
-			lineArray=splitter(line, "\t");
-			if (lineArray.size()!=4){
-				EXIT 	= true;
-				printf("\nLine number %d  in file %s was not formatted properly\nPlease see manual\n",line_number, FILES[u].c_str() );
+		line_number++;
+		chrom=lineArray[0], start=stoi(lineArray[1]), stop=stoi(lineArray[2]), coverage=(stof(lineArray[3]));
+		if (chrom != prevChrom   )  {
+			if (chrom.size() < 6){
+				G[chrom] 	= new segment(chrom, start, stop );
+				INSERT 		= true;
+			}else if(chrom.size() > 6){
+				INSERT 		= false;
 			}
-			line_number++;
-			chrom=lineArray[0], start=stoi(lineArray[1]), stop=stoi(lineArray[2]), coverage=(stof(lineArray[3]));
-			if (chrom != prevChrom   )  {
-				if (chrom.size() < 6 and u==0){
-					G[chrom] 	= new segment(chrom, start, stop );
-					INSERT 		= true;
-				}else if(chrom.size() > 6){
-					INSERT 		= false;
-				}
-			}
-			if (INSERT){
-				vector<double> x(4);
-				double center 	= (stop + start) /2.;
-				x[0]=center, x[1]=start, x[2]=stop, x[3] = abs(coverage);
-				if (u==0){
-					if (coverage > 0){
-						G[chrom]->add2(1, x);
-					}else{
-						G[chrom]->add2(-1, x);						
-					}
-				}else{
-					G[chrom]->add2(-1, x);	
-				}
-			}
-			prevChrom=chrom;
-
 		}
+		if (INSERT){
+			vector<double> x(4);
+			double center 	= (stop + start) /2.;
+			x[0]=center, x[1]=start, x[2]=stop, x[3] = abs(coverage);
+			G[chrom]->add2(1, x);
+		}
+		prevChrom=chrom;
 	}
-	
 	return G;
 }
 vector<segment*> load::load_intervals_of_interest(string FILE){

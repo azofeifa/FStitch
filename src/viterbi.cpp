@@ -38,13 +38,13 @@ double getEmit(vector<double> x, vector<double> W, int k){
 
 
 
-vector<int> runViterbi(vector<vector<double>> X, vector<double> W, vector<vector<double>> a ){
+vector<vector<double>> runViterbi(vector<vector<double>> X, vector<double> W, vector<vector<double>> a ){
 	typedef map<string,contig *>::iterator c_it;
 	static double pi 	= 0.5;
 	static double *  A[2];
 	A[0] 	= new double[2], A[1] 	= new double[2];
 	A[0][0] = a[0][0],A[1][0] = a[1][0],A[0][1] = a[0][1],A[1][1] = a[1][1];
-	vector<int> results;
+	vector<vector<double>> results;
 	if (not X.size()){
 	  return results;
 	}
@@ -74,11 +74,11 @@ vector<int> runViterbi(vector<vector<double>> X, vector<double> W, vector<vector
 					}
 					if ((A[j][i]*trellis[j]->max) > sum){
 						argmax 	= trellis[j];
-						sum 	= (A[j][i]*trellis[j]->max);
+						sum 		= (A[j][i]*trellis[j]->max);
 					}
 
 				}	
-				trellis[i]->next 		= new state(t, max,i,0, 0, chrom);
+				trellis[i]->next 			= new state(t, max,i,0, 0, chrom);
 				trellis[i]->next->ptr 	= argmax;
 			}
 		}
@@ -95,7 +95,7 @@ vector<int> runViterbi(vector<vector<double>> X, vector<double> W, vector<vector
 		for (int i =0 ; i <2; i++){
 			trellis[i]->max   /= max;
 		}
-		
+
 	}
 	int 	t= X.size()-1;
 	state * R;
@@ -108,17 +108,20 @@ vector<int> runViterbi(vector<vector<double>> X, vector<double> W, vector<vector
 	state * rootPath 	= path;
 	state * prev 		= NULL;
 	t--;
-	results.push_back(R->k);
+	vector <double> current 	= {(double)R->k, R->max};
+	results.push_back(current);
 	while (R!=NULL and R->ptr!=NULL){
-		path 		= R;
+		path 			= R;
+		current 		= {(double)R->k, R->max};
 		path->next 	= prev;
-		R 			= R->ptr;
-		results.push_back(R->k);
+		R 				= R->ptr;
+
+		results.push_back(current);
 		prev 		= path;
 		path 	 	= path->prev;
 		t--;
 	}
-	vector<int> switched;
+	vector<vector<double>> switched;
 	for (int t = results.size()-1; t >-1; t--){
 		switched.push_back(results[t]);
 	}
@@ -126,18 +129,18 @@ vector<int> runViterbi(vector<vector<double>> X, vector<double> W, vector<vector
 	// Deallocate necessary arrays
 	return switched;
 }
-double get_f1_second(vector<int> Y, vector<int> pred){
+double get_f1_second(vector<int> Y, vector<vector<double>> pred){
 	double tp=0, fp=0,tn=0,fn=0;
 	double prob 	=0;
 	double P = 0, N = 0;
 	for (int i =0 ; i  < Y.size(); i++ ){
-		if (pred[i]>0 and Y[i] > 0){
+		if (pred[i][0]>0 and Y[i] > 0){
 			P++;
 			tp++;
-		}else if(pred[i]>0 and Y[i] < 1){
+		}else if(pred[i][0]>0 and Y[i] < 1){
 			N++;
 			fp++;
-		}else if (pred[i]<1 and Y[i] < 1){
+		}else if (pred[i][0]<1 and Y[i] < 1){
 			N++;
 			tn++;
 		}else{
@@ -157,40 +160,25 @@ map<string, map<string, vector<segment *> >> run_viteribi_across(map<string, seg
 	map<string, map<string, vector<segment *> >> S ;
 	typedef map<string, segment * >::iterator it_type;
 	for (it_type c = G.begin(); c!=G.end(); c++){
-		vector<vector<double>> st_spf,st_spr;
-		vector<vector<double>> Xf 	= (c->second)->get_contig_info(1,st_spf) ;
-		vector<vector<double>> Xr  	= (c->second)->get_contig_info(-1,st_spr);
-		vector<int> resultsf = runViterbi( Xf,   W, A );
-		vector<int> resultsr = runViterbi( Xr,   W, A );
-		vector<vector<int>> comb;
-		if ((resultsf.size() > 0) and (resultsr.size()>0)){
-		  comb = {resultsf,resultsr};
-		}else if ((resultsf.size() > 0))  {
-		  comb = {resultsf};
-		}else if((resultsr.size() > 0) ){
-		  comb = {resultsr};
-		}
-		vector<vector<vector<double>>> comb_stsp 	= {st_spf,st_spr};
-		string strand = "";
-		double start=0, stop=0;
-		for (int i = 0 ; i < comb.size(); i++){
-			if (i==0){
-				strand 	 = "+";
-			}else{
-				strand 	= "-";
-			}
-			int prev 		= -10;
-			for (int s = 0 ; s < comb[i].size();s++){
-				if (prev!=comb[i][s]){
-					if (prev!= -10){
-						segment * T 	= new segment(c->first, start, stop, prev,strand  );
-						S[strand][c->first].push_back(T);
-					}
-					prev 	= comb[i][s];
-					start 	= comb_stsp[i][s][0];
+		vector<vector<double>> st_sp;
+		vector<vector<double>> X 		= (c->second)->get_contig_info(1,st_sp) ;
+		vector<vector<double>> results 			= runViterbi(X,W,A);
+
+		double start=0, stop=0,running_sum=0,running_count=0;
+		int prev 		= -10;
+		string strand 	= ".";
+		for (int s = 0 ; s < results.size();s++){
+			if (prev!=(int)results[s][0]){
+				if (prev!= -10){
+					segment * T 	= new segment(c->first, start, stop, prev,strand , running_sum/running_count);
+					S[strand][c->first].push_back(T);
 				}
-				stop 		= comb_stsp[i][s][1];
+				prev 	= (int)results[s][0];
+				start = st_sp[s][0];
+				running_sum=0,running_count=0;
 			}
+			stop 		= st_sp[s][1];
+			running_count+=1, running_sum+=results[s][1];
 		}
 	}
 	return S;
@@ -212,7 +200,7 @@ vector<vector<double>> learn_transition_parameters(vector<double> W ,vector<vect
 		vector<double> OFF 	= {a, 1.0-a};
 		A.push_back(ON);
 		A.push_back(OFF);
-		vector<int> results = runViterbi( X,   W, A );
+		vector<vector<double>> results = runViterbi( X,   W, A );
 		double f1 			= get_f1_second(Y, results);
 		if (f1 > bestf1){
 			best_a 			= a, bestf1 			= f1;
