@@ -1,4 +1,4 @@
-#FStitch
+# FStitch
 Below is the README for compiling, running and understanding Fast Read Stitcher (FStitch). This software is written primarily for scientists looking to identify putative nascent transcripts _de novo_ in Global Run-On sequencing<sup>1</sup>. However, users may also find this package useful as a ChIP-seq peak caller.
 
 ![Alt text](https://github.com/azofeifa/FStitch/blob/master/images/IGV_SNAP.png)
@@ -6,7 +6,7 @@ Below is the README for compiling, running and understanding Fast Read Stitcher 
 
 Above: IGV snap shot displays the classifications given by FStitch. Color ‘green’ is read data considered inactive noise. Color ‘blue’ is a putative nascent transcript on the forward strand and ‘red’ on the reverse strand. We identify both genes undergoing nascent transcription and many regions that are unannotated, characteristic of enhancer elements. 
 
-##Brief Overview of FStitch Commands
+## Brief Overview of FStitch Commands
 Here are the minimal commands needed to run FStitch from start to finish; for greater detail on usage and file types see below. 
 ```
 $ FStitch train -i </path/to/BedGraphFile> -j </path/to/TrainingFile>  -o </path/to/Parameters.out>
@@ -14,7 +14,7 @@ $ FStitch train -i </path/to/BedGraphFile> -j </path/to/TrainingFile>  -o </path
 $ FStitch segment -i </path/to/forward/BedGraphFile> -j </path/to/reverse/BedGraphFile> -k </path/to/Parameters.out> -o </path/to/Classifications.bed>
 ```
 
-##System Requirements
+## System Requirements
 FStitch is written in the C++ programming language, with C++11 support and uses OpenMP<sup>4</sup> to parallelize portions of the program.  With this in mind, users will need to have a GCC compilers later than version 4.7 to compile and run FStitch. For mac users, downloading the latest Xcode will update the GCC compiler need be. To check you compiler version, 
 ```
 $ gcc —-version
@@ -53,7 +53,7 @@ $/src/FStitch --help
 ```
 
 
-##FStitch train
+## FStitch train
 FStitch uses two probabilistic models to classify regions of high read density that may be indicative of nascent transcription (GRO-seq) or a read coverage peak (ChIP-seq): Logistic Regression and a Hidden Markov Model. The logistic regression coefficients are estimated via a user defined label training file.  Sense we are classifying regions as signal or noise, FStitch requires regions of the genome that show characteristic transcription or high read dense profiles and regions of the genome that display noise or not a profile of nascent transcription or a read dense region. With this information, FStitch trains a logistic regression classifier and then couples it to a Markov model. The transition parameters for the Markov model are learned via the Baum Welch algorithm and thus do not require user label training data.  
 
 In short, FStitch requires regions the user considers active transcription (or a peak) and regions considered inactive (simply noise). We note that the more regions provided to FStitch the more accurate the classifications however we have in Cross Validation<sup>1</sup> analysis that roughly 10-15 regions of active and inactive regions will yield accurate classifications. These regions are provided to FStitch using a specific file format with four columns separated by tabs: chromosome, genomic coordinate start, genomic coordinate stop, (0 if “noise” or 1 “signal”). An example is given below:
@@ -85,7 +85,7 @@ This will produce the a fie called anyName.out that will store the learned param
 Very important: If FStitch is being used on stranded data, the BedGraph file used in the “FStitch train” command must correspond to the strand indicated in the TrainingFile. For example, if the strand in the training file comes from the forward strand but the user supplies a BedGraph file that is on the reverse strand, then learned parameters will not be accurate. 
 
 
-##FStitch segment
+## FStitch segment
 FStitch segment follows from FStitch train and takes as input the TrainingParameterOutFile (from above, \</path/to/anyName.out>) as input, along with the original BedGraph file. A description of the parameters for FStitch segment are given below
 
 |Flag|Type|Desription|
