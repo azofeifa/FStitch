@@ -73,7 +73,7 @@ Running FStitch train is simple once you have your data in the correct format an
 | -al| number |learning rate for newtons method, default 1
 | -cm| number | max number of iterations for Baum-Welch, default 100
 | -ct| number | convergence threshold for Baum Welch, default 0.01
-
+| -reg| number | regularization parameter for logistic regression classifier, default 1
 Putting this together
 ```
 $ /src/FStitch train -i \</path/to/BedGraphFile\> -j \</path/to/TrainingFile> -o \</path/to/anyName.out>
