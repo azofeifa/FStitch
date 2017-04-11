@@ -38,7 +38,8 @@ double getEmit(vector<double> x, vector<double> W, int k){
 
 
 
-vector<vector<double>> runViterbi(vector<vector<double>> X, vector<double> W, vector<vector<double>> a ){
+vector<vector<double>> runViterbi(vector<vector<double>> X, 
+				vector<double> W, vector<vector<double>> a ){
 	typedef map<string,contig *>::iterator c_it;
 	static double pi 	= 0.5;
 	static double *  A[2];
@@ -68,6 +69,7 @@ vector<vector<double>> runViterbi(vector<vector<double>> X, vector<double> W, ve
 			}else{
 				sum=-1;
 				max=-1;
+				argmax 	= trellis[0];
 				for (int j =0; j <2; j++){
 					if ((A[j][i]*emit*trellis[j]->max) > max){
 						max 	= (A[j][i]*emit*trellis[j]->max);
@@ -151,8 +153,6 @@ double get_f1_second(vector<int> Y, vector<vector<double>> pred){
 	double precision 	= tp / P , recall 	= tn / N ;
 	double f1 	= 2*precision*recall/(precision+ recall);
 	return f1;
-
-
 }
 
 
@@ -187,13 +187,15 @@ map<string, map<string, vector<segment *> >> run_viteribi_across(map<string, seg
 
 
 
-vector<vector<double>> learn_transition_parameters(vector<double> W ,vector<vector<double>> X, vector<int> Y){
+vector<vector<double>> learn_transition_parameters(vector<double> W ,
+				vector<vector<double>> X, vector<int> Y){
 	int res 	= 100;
 	double delta 	= 1.0 / res;
 	double a 		= 0;
 	vector<vector<double>> final_A;
 	double bestf1 			= 0, best_a = 0;
 	for (int s = 0 ; s < res; s++)	{
+		cout.flush();
 		a+=delta;
 		vector<vector<double>> A;
 		vector<double> ON 	= {1.0 - a, a};
@@ -201,16 +203,18 @@ vector<vector<double>> learn_transition_parameters(vector<double> W ,vector<vect
 		A.push_back(ON);
 		A.push_back(OFF);
 		vector<vector<double>> results = runViterbi( X,   W, A );
+		cout.flush();
 		double f1 			= get_f1_second(Y, results);
+		cout.flush();
 		if (f1 > bestf1){
-			best_a 			= a, bestf1 			= f1;
+			best_a 			= a, bestf1 	= f1;
 		}
 	}
 	vector<vector<double>> A;
-	vector<double> ON 	= {1.0 - best_a, best_a};
-	vector<double> OFF 	= {best_a, 1.0-best_a};
-	A.push_back(ON);
-	A.push_back(OFF);
+	vector<double> ONN 	= {1.0 - best_a, best_a};
+	vector<double> OFFF 	= {best_a, 1.0-best_a};
+	A.push_back(ONN);
+	A.push_back(OFFF);
 	return A;
 
 }

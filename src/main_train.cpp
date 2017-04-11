@@ -22,9 +22,10 @@ int run_main_train(paramsTrain PT){
 	bool ChIP 									= not PT.params["-chip"].empty();
 	//=================================================================
 	// parameters specific to Baum Welch and Newtons Method
-	double max_convergence 						= stof(PT.params["-cm"]);
+	int max_convergence 							= stoi(PT.params["-cm"]);
 	double convergence_threshold 				= stof(PT.params["-ct"]);
 	double learning_rate 						= stof(PT.params["-al"]);
+	double reg 										= -stof(PT.params["-reg"]);
 	int maxSeed 									= stoi(PT.params["-ms"]);
 	
 	//=================================================================
@@ -51,24 +52,22 @@ int run_main_train(paramsTrain PT){
 	cout.flush();
 	run_out RO 								= load::convert_to_run_out(integrated_segments);
 	printf("done\n");
-	
 
 	
 	//=================================================================
 	//NEWTONS METHOD  
-	double average_f1 	= 0;
 	printf("running Newton's Method for Logistic Regression......");
 	cout.flush();
-	vector<double> W 							= learn(RO.X, RO.Y, 0, learning_rate,average_f1);
+	vector<double> W 							= learn(RO.X, RO.Y, 0, 
+		learning_rate,max_convergence,reg);
 	printf("done\n");
 
 	//=================================================================
 	//Markov Optimization  
-	vector<vector<double>> A 					= learn_transition_parameters(W , RO.X,  RO.Y);
-	printf("Learned Parameters               : %f,%f,%f\n",W[0],W[1],W[2] );
-	printf("Average F1 precision             : %f\n", average_f1);
-	printf("Markov Chain Transition Matrix   : {%f, %f} {%f, %f}\n",A[0][0],A[0][1],A[1][0],A[1][1]);
-	printf("writing out parameters...............................");
+	printf("estimating transition parameters.....................");
+	cout.flush();
+	vector<vector<double>> A 			= learn_transition_parameters(W , RO.X,  RO.Y);
+	printf("done\n");
 	cout.flush();
 	
 	writeTrainingFile(outFile, W,   A, learning_rate,  max_convergence,  convergence_threshold);

@@ -98,6 +98,7 @@ map<string,contig *> readBedGraphFile(string, map<string, interval *>, bool);
 map<string, map<string, interval *>> readRefSeq(string);
 RTOF readTrainingOutFile(string);
 map<string,contig *> readBedGraphFileAll(string,int);
+
 class run_out{
 public:
 	vector< vector<double> > X ;

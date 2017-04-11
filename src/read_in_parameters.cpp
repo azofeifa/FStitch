@@ -111,12 +111,12 @@ paramsTrain::paramsTrain(){
 	params["-ij"] 	= "";
 
 	params["-k"] 	= "";
-
 	params["-o"] 	= "";
 	params["-r"] 	= "";
 	params["-v"] 	= "";
 	params["-np"] 	= "8";
 	params["-cm"] 	= "100";
+	params["-reg"] = "1";
 	params["-ct"] 	= "0.1";
 	params["-al"] 	= "0.4";
 	params["-ms"] 	= "20";
@@ -133,14 +133,18 @@ void paramsTrain::display(){
 	if (not params["-v"].empty()){
 	cout<<"verbose output : True"<<endl;
 	}
+	cout<<endl;
 	if (params["-cm"]!="100"){
 	cout<<"max iterations (user defined): "<<params["-cm"]<<endl;
 	}
 	if (params["-ct"]!="0.1"){
 	cout<<"convergence threshold (user defined): "<<params["-ct"]<<endl;
 	}
-	if (params["-al"]!="1"){
-	cout<<"learning rate (user defined): "<<params["-ct"]<<endl;
+	if (params["-al"]!="0.4"){
+	cout<<"learning rate (user defined): "<<params["-al"]<<endl;
+	}
+	if (params["-reg"]!="1"){
+	cout<<"regularization parameter (user defined): "<<params["-reg"]<<endl;
 	}
 	if (not params["-chip"].empty()){
 	cout<<"ChIP Data      : True"<<endl;

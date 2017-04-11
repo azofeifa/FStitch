@@ -12,36 +12,52 @@
 
 using namespace std;
 
+void print_matirx(vector<vector<double>> A){
+	printf("\n");
+	for (int i = 0; i < A.size(); i++) {
+		for (int j = 0 ; j < A[i].size(); j++) {
+			printf("%f,", A[i][j] );
+		}
+		printf("\n");
+	}
+}
 
-vector< vector<double> > transpose(vector<vector<double> > H){
+void print_vector(vector<double> A){
+	printf("\n");
+	for (int i = 0; i < A.size(); i++) {
+			printf("%f,", A[i] );
+	}
+}
+
+vector< vector<double> > transpose(vector<vector<double> > H) {
 	//==============================================================
 	//	!!!!!!!!!!!!!!!This function is incomplete!!!!!!!!!!!!!!!
 	//	Only handles square matrices and vectors...
 	//==============================================================
 	int dim = H.size();
-	int k,l, temp;
-	if (dim ==1 ){ //this is just a row vector...make a column vector
+	int k, l, temp;
+	if (dim == 1 ) { //this is just a row vector...make a column vector
 		vector<vector<double> > newH;
-		for (int i = 0; i < H[0].size(); i ++){
+		for (int i = 0; i < H[0].size(); i ++) {
 			newH.push_back(vector<double>(1));
 			newH[i][0] 	= H[0][i];
 		}
 		return newH;
 	}
-	if (H[0].size() == 1 ){//this is just a column vector...make a row vector
+	if (H[0].size() == 1 ) { //this is just a column vector...make a row vector
 		vector<vector<double> > newH;
 		newH.push_back(vector<double>(H.size()));
-		for (int i =0; i < H.size(); i++){
-			newH[0][i]=H[i][0];
+		for (int i = 0; i < H.size(); i++) {
+			newH[0][i] = H[i][0];
 		}
 		return newH;
 	}
 
 	//This should only happend below if its a square matrix....
-	for (int r = 0; r < dim; r++){
-		for (int i =r; i < dim; i++){
-			for (int j = i; j < dim; j++){
-				if (i !=j){
+	for (int r = 0; r < dim; r++) {
+		for (int i = r; i < dim; i++) {
+			for (int j = i; j < dim; j++) {
+				if (i != j) {
 					k 		= j;
 					l		= i;
 					temp 	= H[i][j];
@@ -54,103 +70,116 @@ vector< vector<double> > transpose(vector<vector<double> > H){
 	}
 	return H;
 }
-double g(vector<double> x, vector<double> w){
-	if (x.size() != w.size()){
-		cout<<"!!parameter and x vectors are not same dimension!!"<<endl;
-		return 0;
+double g(vector<double> x, vector<double> w) {
+	if (x.size() != w.size()) {
+		cout << "!!parameter and x vectors are not same dimension!!" << endl;
+		return -1;
 	}
 	double sum = 0;
-	for (int i = 0; i < x.size(); i++){
-		sum+=x[i]*w[i];
+	for (int i = 0; i < x.size(); i++) {
+		sum += x[i] * w[i];
 	}
 	double vl 	= exp(sum) / (1.0 + exp(sum));
-	if (std::isinf(exp(sum))){
+	if (std::isinf(exp(sum))) {
 		return 1.0;
 	}
-	if (std::isnan(vl)){
+	if (std::isnan(vl)) {
 		return 1.0;
 	}
 	return vl;
 }
-vector<vector<double> > gradient(vector< vector<double> > X, vector<int> Y,vector<double> W){
-	vector<vector<double> > gradient;
+vector<vector<double> > gradient(vector< vector<double> > X, 
+					vector<int> Y, vector<double> W, bool EXIT) {
+	vector<vector<double> > GRAD;
 	int N	= X.size(); //Number of Training Examples
 	int K	= W.size(); //Feature Dimensions
 	int i, j;
-	gradient.push_back(vector<double>(K));
-	for (i = 0; i <K; i++){
-		gradient[0][i]=0;
+	GRAD.push_back(vector<double>(K));
+	for (i = 0; i < K; i++) {
+		GRAD[0][i] = 0;
 	}
 
 
-	for (i = 0; i < N; i++ ){
-		for (j = 0; j < K; j++ ){
-			gradient[0][j]+=X[i][j]*(Y[i] - g(X[i], W));
+	for (i = 0; i < N; i++ ) {
+		for (j = 0; j < K; j++ ) {
+			double vl 	= g(X[i], W);
+			if (vl < -1){
+				EXIT 	= true;
+				return GRAD;
+			}
+			GRAD[0][j] += X[i][j] * (Y[i] - vl);
 		}
 	}
-	return gradient;
+	EXIT=false;
+	return GRAD;
 }
-vector< vector<double> > hessian(vector< vector<double> > X, vector<int> Y, vector<double> W){
+vector< vector<double> > hessian(vector< vector<double> > X, 
+												vector<int> Y, 
+												vector<double> W, double reg) {
 	vector< vector<double> > H;
 	int N	= X.size(); //Number of Training Examples
 	int K	= W.size(); //Feature Dimensions
 	int i, j, n;
 	//Initialize H
-	for (j = 0; j < K; j++){
+	for (j = 0; j < K; j++) {
 		H.push_back(vector<double>(K));
-		for (n = 0; n < K; n++){
+		for (n = 0; n < K; n++) {
 			H[j][n] = 0;
 		}
 	}
 
-	for (i = 0; i<N;i++){
-		for (j = 0; j < K; j++){
-			for (n = 0; n < K; n++){
-				H[j][n]+=X[i][j]*X[i][n]*g(X[i], W)*(1-g(X[i], W));
+	for (i = 0; i < N; i++) {
+		for (j = 0; j < K; j++) {
+			for (n = 0; n < K; n++) {
+				H[j][n] += X[i][j] * X[i][n] * g(X[i], W) * (1 - g(X[i], W));
 			}
 		}
 	}
-	for (j = 0; j < K; j++){
-		for (n = 0; n < K; n++){
-			H[j][n]=(-1*H[j][n]);
+	for (j = 0; j < K; j++) {
+		for (n = 0; n < K; n++) {
+			if (j > 0 and n == j){
+				H[j][n] = (-1 * H[j][n]) + (reg/double(K));
+			}else{
+				H[j][n] = (-1 * H[j][n]);
+			}
 		}
 	}
 
 	return H;
 }
-vector<double> mult(vector<double> A, double X){
+vector<double> mult(vector<double> A, double X) {
 	vector<double> a(A.size());
-	for(int i = 0; i < A.size(); i++){
-		a[i] = A[i] *X;
+	for (int i = 0; i < A.size(); i++) {
+		a[i] = A[i] * X;
 	}
 	return a;
 }
-vector<double> sub(vector<double> A, vector<double> B){
+vector<double> sub(vector<double> A, vector<double> B) {
 	vector<double> a(A.size());
-	for(int i = 0; i < A.size(); i++){
+	for (int i = 0; i < A.size(); i++) {
 		a[i] = A[i] - B[i];
 	}
 	return a;
 }
-vector<double> add(vector<double> A, vector<double> B){
+vector<double> add(vector<double> A, vector<double> B) {
 	vector<double> a(A.size());
-	for(int i = 0; i < A.size(); i++){
+	for (int i = 0; i < A.size(); i++) {
 		a[i] = A[i] + B[i];
 	}
 	return a;
 }
-vector< vector<double> > identity(int dim){
+vector< vector<double> > identity(int dim) {
 	vector< vector<double> > I(dim);
-	for (int i =0; i< dim; i++){
+	for (int i = 0; i < dim; i++) {
 		I[i]	= vector<double>(dim);
 		I[i][i] = 1;
 	}
 	return I;
 }
-vector<vector<double> > add_matrices(vector<vector<double> > A, vector<vector<double> > B ){
+vector<vector<double> > add_matrices(vector<vector<double> > A, vector<vector<double> > B ) {
 	vector<vector<double> > C 	= identity(A.size());
-	for (int i =0; i <A.size(); i++){
-		for (int j =0; j <A[i].size();j++){
+	for (int i = 0; i < A.size(); i++) {
+		for (int j = 0; j < A[i].size(); j++) {
 			C[i][j] 	= A[i][j] + B[i][j];
 		}
 	}
@@ -160,32 +189,32 @@ vector<vector<double> > add_matrices(vector<vector<double> > A, vector<vector<do
 }
 
 
-double dot(vector<double> A, vector<double> B){
+double dot(vector<double> A, vector<double> B) {
 	int dim		= A.size();
 	double sum	= 0;
-	if (A.size() != B.size()){
-		cout<<"Vectors need to be the same dimension..."<<endl;
+	if (A.size() != B.size()) {
+		cout << "Vectors need to be the same dimension..." << endl;
 		return 0;
 	}
-	for (int i = 0; i < dim; i++){
-		sum+=(A[i]*B[i]);
+	for (int i = 0; i < dim; i++) {
+		sum += (A[i] * B[i]);
 	}
 	return sum;
 }
 
-vector< vector<double> > concatenate(vector< vector<double> > A, vector< vector<double> > B){
+vector< vector<double> > concatenate(vector< vector<double> > A, vector< vector<double> > B) {
 	int dim1	= A.size();
 	int dim2	= B.size();
 
-	for (int i=0;i<dim1;i++){
-		for (int j =0;j<dim2;j++){
+	for (int i = 0; i < dim1; i++) {
+		for (int j = 0; j < dim2; j++) {
 			A[i].push_back(B[i][j]);
 		}
 	}
 	return A;
 
 }
-vector<vector<double> > matrix_mult(vector<vector<double> > A, vector<vector<double> > B){
+vector<vector<double> > matrix_mult(vector<vector<double> > A, vector<vector<double> > B) {
 	int A_i 	= A.size();
 	int A_j 	= A[0].size();
 	//dimensions of matrix A is A_i x A_j
@@ -193,32 +222,116 @@ vector<vector<double> > matrix_mult(vector<vector<double> > A, vector<vector<dou
 	int B_j 	= B[0].size();
 	//dimensions of matrix B is B_i x B_j
 	//check to make sure that A_j == B_i
-	if (A_j != B_i){
-		cout<<"Matrices need to be in the right dimensions..."<<endl;
+	if (A_j != B_i) {
+		cout << "Matrices need to be in the right dimensions..." << endl;
 	}
 	//The new matrix becomes dimensions A_i j B_j
 	vector< vector<double> > H(A_i);
-	for (int i =0; i< A_i; i ++){
+	for (int i = 0; i < A_i; i ++) {
 		H[i] = vector<double>(B_j);
 	}
 	//take the tranpose of B...it will be easier to the dot product of the column vectors
 	B 	= transpose(B);
 	//Now fil out the new matrix by doing a series of dot products
-	for (int i = 0; i < A_i; i++){
-		H[i]=vector<double>(B_j);
-		for (int j = 0; j< B_j; j++){
+	for (int i = 0; i < A_i; i++) {
+		H[i] = vector<double>(B_j);
+		for (int j = 0; j < B_j; j++) {
 			H[i][j] = dot(A[i], B[j]);
 		}
 	}
 	return H;
 }
-vector< vector<double> > inv(vector<vector<double> > H){ //uses gauss-jordon elimination
+
+
+vector<vector<double>> calculateInverse(vector< vector<double> > B) {
+
+
+	int n = B.size();
+	// fill out A to make this code work
+	vector<vector<double>> A;
+	for (int i =0 ; i < n;i++ ){
+		vector<double>row;
+		for (int j = 0 ; j < 2*n; j++){
+			if ( j < n){
+				row.push_back(B[i][j]);
+			}else{
+				row.push_back(1);				
+			}
+		}
+		A.push_back(row);
+	}
+
+
+
+	for (int i = 0; i < n; i++) {
+		// Search for maximum in this column
+		double maxEl = abs(A[i][i]);
+		int maxRow	 = i;
+		for (int k = i + 1; k < n; k++) {
+			if (abs(A[k][i]) > maxEl) {
+				maxEl = A[k][i];
+				maxRow = k;
+			}
+		}
+
+		// Swap maximum row with current row (column by column)
+		for (int k = i; k < 2 * n; k++) {
+			double tmp = A[maxRow][k];
+			A[maxRow][k] = A[i][k];
+			A[i][k] = tmp;
+		}
+
+		// Make all rows below this one 0 in current column
+		for (int k = i + 1; k < n; k++) {
+			double c = -A[k][i] / A[i][i];
+			for (int j = i; j < 2 * n; j++) {
+				if (i == j) {
+					A[k][j] = 0;
+				} else {
+					A[k][j] += c * A[i][j];
+				}
+			}
+		}
+	}
+
+	// Solve equation Ax=b for an upper triangular matrix A
+	for (int i = n - 1; i >= 0; i--) {
+		for (int k = n; k < 2 * n; k++) {
+			A[i][k] /= A[i][i];
+		}
+	// this is not necessary, but the output looks nicer:
+		A[i][i] = 1;
+
+		for (int rowModify = i - 1; rowModify >= 0; rowModify--) {
+			for (int columModify = n; columModify < 2 * n; columModify++) {
+				A[rowModify][columModify] -= A[i][columModify]
+				                             * A[rowModify][i];
+			}
+		// this is not necessary, but the output looks nicer:
+			A[rowModify][i] = 0;
+		}
+	}
+	// finall return the right most porition of this matrix
+	vector<vector<double>> C;
+	for (int i = 0 ; i < n; i ++){
+		vector<double> row;
+		for (int j = 0 ; j < n ; j++){
+			row.push_back(A[i][j+n]);
+		}
+		C.push_back(row);
+	}
+
+	return C; 
+}
+
+
+vector< vector<double> > inv(vector<vector<double> > H) { //uses gauss-jordon elimination
 
 	//=======================================================================================================
 	//	This was kind of a bitch to write, but the matrix data structure is a vector of vectors
 	//	Need to put in some checks like make sure its a square matrix and has a non-zero determinat
 	//  But yeah it works like every other algorithm out there, place next to the matrix of interest its
-	// 	identity matrix and do row eliminations on the matrix of interest until you get it down to identity
+	// identity matrix and do row eliminations on the matrix of interest until you get it down to identity
 	//	then just return the now modified identity matrix.
 	//=======================================================================================================
 
@@ -228,26 +341,26 @@ vector< vector<double> > inv(vector<vector<double> > H){ //uses gauss-jordon eli
 	int k	= 0;
 	int l	= 0;
 
-	vector< vector<double> > I = identity(dim);
-	vector< vector<double> > H_T = transpose(H);
-	H = concatenate(H,I);
+	vector< vector<double> > I 	= identity(dim);
+	vector< vector<double> > H_T 	= transpose(H);
+	H 										= concatenate(H, I);
 	double multiple;
-	vector<double> row1,row2, erow;
+	vector<double> row1, row2, erow;
 
 
-	while (i < dim){
-		if (H[i][i] == 0){
-			k=j;
-			while (k<dim){ 			//find a non zero entry in the ith column and swap
-				if (H[k][i] != 0){  //if all non zero than just increase i,j by one
+	while (i < dim) {
+		if (H[i][i] == 0) {
+			k = j;
+			while (k < dim) { 			//find a non zero entry in the ith column and swap
+				if (H[k][i] != 0) { //if all non zero than just increase i,j by one
 					break;
 				}
 				k++;
 			}
-			if (k == dim){ //just need to increase i,j by one...everything below was zeros
+			if (k == dim) { //just need to increase i,j by one...everything below was zeros
 				H[i][i]++;
 			}
-			else{ //here is the swapping...
+			else { //here is the swapping...
 				row1 	= H[i];
 				row2 	= H[k];
 				H[i] 	= row2;
@@ -259,104 +372,111 @@ vector< vector<double> > inv(vector<vector<double> > H){ //uses gauss-jordon eli
 		H[i] 	= mult(H[i], (1.0 / H[i][i]));
 		//now eliminate all other entries in the jth column by subtracking suitable
 		//multiples of the ith row from other rows
-		j=i;
-		j+=1;
-		while (j < dim){
-			if (H[j][i] != 0){
+		j = i;
+		j += 1;
+		while (j < dim) {
+			if (H[j][i] != 0) {
 				multiple	= H[i][i] * H[j][i];
 				row1 		= mult(H[i], (multiple / H[i][i]));
 				row2 		= mult(H[j], (multiple / H[j][i]));
-				if ((row1[i] + row2[i]) == 0){
-					erow 	= add(row1,row2);
+				if ((row1[i] + row2[i]) == 0) {
+					erow 	= add(row1, row2);
 				}
-				else if ((row1[i] - row2[i]) == 0){
-					erow 	= sub(row2,row1);
+				else if ((row1[i] - row2[i]) == 0) {
+					erow 	= sub(row2, row1);
 				}
-				else{
-					cout<<"ERROR Forward Pass"<<endl;
+				else {
+					cout << "ERROR Forward Pass" << endl;
 				}
 				H[j] 	= erow;
 			}
-			j+=1;
+			j += 1;
 		}
-		i+=1;
-		j=i;
+		i += 1;
+		j = i;
 	}
 	//So now that its in reduced echelon form, we have to go back and make the other side of triangle all zeros
-	i-=1;
-	while (i>-1){
-		j=i-1;
+	i -= 1;
+	while (i > -1) {
+		j = i - 1;
 
-		while (j > -1){
-			if (H[j][i] != 0){
-				multiple 	= H[i][i]*H[j][i];
+		while (j > -1) {
+			if (H[j][i] != 0) {
+				multiple 	= H[i][i] * H[j][i];
 				row1 		= mult(H[i], (multiple / H[i][i]));
 				row2 		= mult(H[j], (multiple / H[j][i]));
 
-				if ((row1[i] + row2[i]) == 0){
-					erow 	= add(row1,row2);
-				}else if((row1[i] - row2[i]) == 0){
-					erow 	= sub(row2,row1);
+				if ((row1[i] + row2[i]) == 0) {
+					erow 	= add(row1, row2);
+				} else if ((row1[i] - row2[i]) == 0) {
+					erow 	= sub(row2, row1);
 				}
-				else{
-					cout<<"WHAT(Backward Pass)"<<endl;
+				else {
+					cout << "WHAT(Backward Pass)" << endl;
 				}
 				H[j] 	= erow;
 			}
-			j-=1;
+			j -= 1;
 		}
-		i-=1;
+		i -= 1;
 	}
 
 	//Now Just return the inverse
 
 	vector< vector<double> > INV;
-	for (i = 0; i < H.size();i++){
+	for (i = 0; i < H.size(); i++) {
 		INV.push_back(vector<double>(dim));
-		for (j = dim; j < H[i].size();j++){
-			INV[i][j-dim] 	= H[i][j];
+		for (j = dim; j < H[i].size(); j++) {
+			INV[i][j - dim] 	= H[i][j];
 		}
 	}
 
 	return INV;
 }
-double loglikelihood(vector<vector<double> >X,  vector<int> Y, vector<double> W){
+double loglikelihood(vector<vector<double> >X,  vector<int> Y, vector<double> W) {
 	double ll = 0.0;
 
-	for (int i =0; i < X.size(); i++){
-		ll+=(	(log(1-g(X[i], W) )) + (Y[i]*(dot(X[i], W)))	);
+	for (int i = 0; i < X.size(); i++) {
+		ll += (	(log(1 - g(X[i], W) )) + (Y[i] * (dot(X[i], W)))	);
 	}
 	return ll;
 }
-double cost(vector<vector<double> >X,  vector<int> Y, vector<double> W){
+double cost(vector<vector<double> >X,  vector<int> Y, vector<double> W) {
 	double COST		= 0.0;
 	int prediction 	= 0;
-	for (int i =0; i < X.size(); i++){
-		if ((g(X[i], W)) < 0.5){
+	for (int i = 0; i < X.size(); i++) {
+		if ((g(X[i], W)) < 0.5) {
 			prediction = 0;
 		}
-		else{
+		else {
 			prediction = 1;
 		}
 
-		COST+=(abs(prediction-Y[i]));
+		COST += (abs(prediction - Y[i]));
 	}
 	COST 	= (COST / X.size());
 	return COST;
 }
 
-double difference(vector<double> W, vector<double> P_W){
-	double sum=0;
-	for (int i =0; i < W.size(); i++){
-		sum+=abs(W[i]-P_W[i]);
+double difference(vector<double> W, vector<double> P_W) {
+	double sum = 0;
+	for (int i = 0; i < W.size(); i++) {
+		sum += abs(W[i] - P_W[i]);
 	}
 	return sum;
 }
 
 
-vector<double> NewtonsMethod(vector< vector<double> > X, vector<int> Y, bool verbose, double alpha){
+vector<double> NewtonsMethod(vector< vector<double> > X,
+                             vector<int> Y, bool verbose, double alpha, int T,double reg_lambda) {
+	/*
+		==============
+		adding regularization, might help with matrix inverse calcs?
+	*/
+
+
 	vector<double> W;
-	for (int i = 0; i < X[0].size(); i++){
+	for (int i = 0; i < X[0].size(); i++) {
 		W.push_back(0.0); 	//Initialize Starting Weights to Zero
 	}
 	vector< vector<double> > reg = identity(X[0].size());
@@ -375,161 +495,128 @@ vector<double> NewtonsMethod(vector< vector<double> > X, vector<int> Y, bool ver
 	vector<vector<double> > G;
 	vector<vector<double> > current_gradient;
 
-	int T							= 200;
 	int t							= 0;
-	double LL 						= 0;
-	double previous					= 0;
-	double *ptr 					= &previous;
-	double convergence_threshold 	= 1.0 / 1000000;
+	double LL 					= 0;
+	double previous			= 0;
+	double *ptr 				= &previous;
+	double convergence_threshold 	= pow(10,-3);
 	double prev_T					= 0;
 	vector<double> P_W(W.size());
 	vector<double> gamma(W.size());
-	int ct=0;
-	while (t < T){
+	int ct = 0;
+	bool EXIT=false;
+	while (t < T) {
 
-		G 					= gradient(X,Y,W);
-
-		H 					= hessian(X,Y,W);
-		for (int h =0; h < H.size(); h++ ){
-			for (int o =0; o < H.size(); o++ ){
-				if (H[h][o]!=H[h][o]){
-					cout<<"Logistic Regression Blew Up...Did not converge..."<<endl;
-					cout<<"Final Parameter Set...."<<endl;
-					for (int i=0; i < W.size(); i++){
-						cout<<to_string(W[i]).substr(0,10)<<"\t";
+		G 					= gradient(X, Y, W,EXIT);
+		if (EXIT){
+			break;
+		}
+		H 					= hessian(X, Y, W, reg_lambda);
+		for (int h = 0; h < H.size(); h++ ) {
+			for (int o = 0; o < H.size(); o++ ) {
+				if (H[h][o] != H[h][o]) {
+					cout << "Logistic Regression Blew Up...Did not converge..." << endl;
+					cout << "Final Parameter Set...." << endl;
+					for (int i = 0; i < W.size(); i++) {
+						cout << to_string(W[i]).substr(0, 10) << "\t";
 					}
-					cout<<endl;
+					cout << endl;
 					return W;
 				}
 			}
 		}
 		INV_H 				= inv(H);
+		//INV_H 				= calculateInverse(H);
 		current_gradient	= transpose(matrix_mult(INV_H, transpose(G)));
-		gamma				= sub(W,current_gradient[0]);
-		W 					= add(mult(W, 1-alpha), mult(gamma, alpha) );
-
-		LL 					= loglikelihood(X,Y,W);
-		
+		gamma					= sub(W, current_gradient[0]);
+		W 						= add(mult(W, 1 - alpha), mult(gamma, alpha) );
+		LL 					= loglikelihood(X, Y, W);
+		if (LL <= -pow(10,100)){
+			return P_W;
+		}
 		ct++;
 		t++;
-		if(ptr != NULL && abs(difference(W,P_W)) < convergence_threshold){
-			
+		if (ptr != NULL && abs(LL-previous) < convergence_threshold) {
 			return W;
 		}
 		*ptr = LL;
 		P_W 	= W;
-		if (( t / (double)T ) > (prev_T+0.25) and verbose){
+		if (( t / (double)T ) > (prev_T + 0.25) and verbose) {
 			prev_T 	= t / (double)T;
 		}
+		previous=LL;
 	}
-	cout<<"Warning: Learning Algorithm did not converge..."<<endl;
-	cout<<"Consider increasing number of maximum iterations..."<<endl;
+	cout << "Warning: Learning Algorithm did not converge..." << endl;
+	cout << "Consider increasing number of maximum iterations..." << endl;
 	return W;
 }
 
 
 
 void get_rand_sample(vector< vector<double> > X, vector<int> Y,
-		vector< vector<double> > & nX, vector<int> & nY,
-		vector< vector<double> > & tnX, vector<int> & tnY, double PROP){
-	
-	double ON=0, OFF=0;
-	
-	for (int s = 0 ; s < Y.size(); s++){
-		if (Y[s]>0){
-			ON++;
-		}else{
-			OFF++;
-		}
-	}
-	double prop 	= ON / (ON + OFF);
+                     vector< vector<double> > & nX, vector<int> & nY,
+                     vector< vector<double> > & tnX, vector<int> & tnY, 
+                     double PROP, double & ON,double & OFF, double & ONt,double & OFFt) {
 	random_device rd;
 	mt19937 mt(rd());
 	uniform_real_distribution<double> dist(0, 1);
 	ON 	= 0, OFF = 0;
-	for (int s = 0 ; s < Y.size(); s++){
-		if (dist(mt) < PROP){
-			if (Y[s] > 0 and dist(mt) < (1.0 - prop)){
-				nX.push_back(X[s]);
-				nY.push_back(Y[s]);
+	for (int s = 0 ; s < Y.size(); s++) {
+		if (dist(mt) < PROP) {
+			nX.push_back(X[s]);
+			nY.push_back(Y[s]);
+			if (Y[s]){
 				ON++;
-			}else if(Y[s] <1 and dist(mt) > (1.0 - prop) ){
-				nX.push_back(X[s]);
-				nY.push_back(Y[s]);
+			}else{
 				OFF++;
 			}
 		}else{
-			if (Y[s] > 0 and dist(mt) < (1.0 - prop)){
-				tnX.push_back(X[s]);
-				tnY.push_back(Y[s]);
-			}
-			else if(Y[1] < 1 and dist(mt) < prop ){
-				tnX.push_back(X[s]);
-				tnY.push_back(Y[s]);
+			tnX.push_back(X[s]);
+			tnY.push_back(Y[s]);			
+			if (Y[s]){
+				ONt++;
+			}else{
+				OFFt++;
 			}
 		}
 	}
 }
 
-double get_f1(vector<double> W, vector<vector<double>> X, vector<int> Y){
-	double tp=0, fp=0,tn=0,fn=0;
-	double prob 	=0;
+double get_f1(vector<double> W, vector<vector<double>> X, vector<int> Y) {
+	double tp = 0, fp = 0, tn = 0, fn = 0;
+	double prob 	= 0;
 	double P = 0, N = 0;
-	for (int i =0 ; i  < X.size(); i++ ){
-		prob 	= g(X[i],W);
-		if (prob > 0.5 and Y[i] > 0){
+	for (int i = 0 ; i  < X.size(); i++ ) {
+		prob 	= g(X[i], W);
+		if (prob < 0){
+			print_vector(X[i]);
+			print_vector(W);
+			break;
+		}
+		if (prob > 0.5 and Y[i] > 0) {
 			P++;
 			tp++;
-		}else if(prob > 0.5 and Y[i] < 1){
+		} else if (prob > 0.5 and Y[i] < 1) {
 			N++;
 			fp++;
-		}else if (prob < 0.5 and Y[i] < 1){
+		} else if (prob < 0.5 and Y[i] < 1) {
 			N++;
 			tn++;
-		}else{
+		} else {
 			fn++;
 			P++;
 		}
 	}
 	double precision 	= tp / P , recall 	= tn / N ;
-	double f1 	= 2*precision*recall/(precision+ recall);
+	double f1 	= 2 * precision * recall / (precision + recall);
 	return f1;
-
-
 }
 
 
-vector<double> learn(vector< vector<double> > X, vector<int> Y, bool verbose, 
-	double alpha, double & final_f1){
-	vector<double> W;
-	double F1=0;
-	double N = 0;
-	vector<double> best_W;
-	double argFI = 0;
-	for (int i = 0 ; i < 50; i++){
-		vector< vector<double> >  nX;
-		vector<int> nY;
-		vector< vector<double> > tnX;
-		vector<int>  tnY;
-		get_rand_sample(X, Y,nX, nY, tnX, tnY,0.8);
-		W 	= NewtonsMethod(nX,nY, verbose,alpha);
-		double f1 	= get_f1(W,  X,  Y);
-		if (f1 > argFI ){
-			best_W 	= W, argFI = f1;
-		}
-		F1+=f1;
-		N+=1;
+vector<double> learn(vector< vector<double> > X, vector<int> Y, bool verbose,
+                     double alpha, int T,double reg) {
 
-	}
-	F1/=N;
-	vector< vector<double> >  nX;
-	vector<int> nY;
-	vector< vector<double> > tnX;
-	vector<int>  tnY;
-	get_rand_sample(X, Y,nX, nY, tnX, tnY,1.0);
+	vector<double >W 	= NewtonsMethod(X, Y, verbose, alpha, T,reg);
 
-	W 	= NewtonsMethod(nX,nY, verbose,alpha);
-	double f1 	= get_f1(W, X, Y);
-	final_f1 	= argFI;
-	return best_W;
+	return W;
 }
