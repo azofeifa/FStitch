@@ -28,7 +28,7 @@ You can compile FStitch by moving into the directory and running
 $ ./configure --prefix=$HOME/apps/fstitch
 $ make
 $ make install
-$ echo 'export PATH=$HOME/apps/fstitch/bin' >> ~/.bashrc
+$ echo 'export PATH=$HOME/apps/fstitch/bin:$PATH' >> ~/.bashrc
 $ source ~/.bashrc
 ```
 
