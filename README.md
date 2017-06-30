@@ -97,7 +97,7 @@ FStitch segment follows from FStitch train and takes as input the TrainingParame
 
 Putting this together
 ```
-$ /src/FStitch segment -i \</path/to/BedGraphFile\> -j \</path/to/anyName.out> -o \</path/to/anyName.bed> 
+$ /src/FStitch segment -i \</path/to/BedGraphFile\> -k \</path/to/anyName.out> -o \</path/to/anyName.bed> 
 ```
 This will produce a file called anyName.bed, and can be imported into any genome browser)
 
