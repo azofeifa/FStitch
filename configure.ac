@@ -5,6 +5,7 @@ AC_PREREQ([2.62])
 AC_INIT([FStitch], [0.1], [joseph.azofeifa@colorado.edu])
 AM_INIT_AUTOMAKE([foreign])
 AM_SILENT_RULES([yes])
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/viterbi.h])
 AC_CONFIG_HEADERS([config.h])
 
